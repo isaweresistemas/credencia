@@ -94,12 +94,12 @@
 <script>
 // ===== CONFIG =====
 const CONFIG = {
-  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbySSIglvimz5jN4MbdY38Dwsn1Tg5AErRMEHw5c1u5cZy9mJryN-wq9two0S8OeBeRH/exec", 
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbySSIglvimz5jN4MbdY38Dwsn1Tg5AErRMEHw5c1u5cZy9mJryN-wq9two0S8OeBeRH/exec",
 };
 
 async function appsScriptFetch(params){
   const url=CONFIG.APPS_SCRIPT_URL+"?"+new URLSearchParams(params);
-  const r=await fetch(url,{redirect:"follow",mode:"cors"});
+  const r=await fetch(url,{redirect:"follow"});
   if(!r.ok)throw new Error("HTTP "+r.status);
   return r.json();
 }

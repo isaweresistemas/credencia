@@ -117,7 +117,8 @@
 
 <script>
 // ===== CONFIG =====
-const CONFIG = { APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbySSIglvimz5jN4MbdY38Dwsn1Tg5AErRMEHw5c1u5cZy9mJryN-wq9two0S8OeBeRH/exec" };
+const CONFIG = { APPS_SCRIPT_URL: "const CONFIG = { APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbySSIglvimz5jN4MbdY38Dwsn1Tg5AErRMEHw5c1u5cZy9mJryN-wq9two0S8OeBeRH/exec" };
+const modoDemo = CONFIG.APPS_SCRIPT_URL.includes("SEU_ID_AQUI");" };
 
 // ===== UTILS =====
 function formatCPF(v){v=v.replace(/\D/g,"");if(v.length>11)v=v.slice(0,11);return v.replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");}

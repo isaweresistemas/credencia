@@ -427,13 +427,12 @@ const modoDemo = CONFIG.APPS_SCRIPT_URL.includes("SEU_ID_AQUI");
 
 async function apiFetch(p){
   const u = CONFIG.APPS_SCRIPT_URL + "?" + new URLSearchParams(p);
-  const r = await fetch(u, { redirect: "follow", mode: "cors" });
+  const r = await fetch(u, { redirect: "follow" });
   return r.json();
 }
 async function apiPost(d){
-  // Apps Script não aceita POST com body JSON via CORS externo — enviamos via GET
   const u = CONFIG.APPS_SCRIPT_URL + "?" + new URLSearchParams(d);
-  const r = await fetch(u, { redirect: "follow", mode: "cors" });
+  const r = await fetch(u, { redirect: "follow" });
   return r.json();
 }
 

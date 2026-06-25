@@ -301,8 +301,10 @@ function formatPhone(v){v=v.replace(/\D/g,"");if(v.length>11)v=v.slice(0,11);if(
 function validCPF(c){c=c.replace(/\D/g,"");if(c.length!==11||/^(\d)\1+$/.test(c))return false;let s=0;for(let i=0;i<9;i++)s+=+c[i]*(10-i);let r=s%11<2?0:11-s%11;if(r!==+c[9])return false;s=0;for(let i=0;i<10;i++)s+=+c[i]*(11-i);r=s%11<2?0:11-s%11;return r===+c[10];}
 function validEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);}
 function nowBR(){const d=new Date();return d.toLocaleDateString("pt-BR")+" "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});}
-async function appsScriptFetch(p){const u=CONFIG.APPS_SCRIPT_URL+"?"+new URLSearchParams(p);const r=await fetch(u,{redirect:"follow"});return r.json();}
-async function appsScriptPost(d){const r=await fetch(CONFIG.APPS_SCRIPT_URL,{method:"POST",redirect:"follow",body:JSON.stringify(d)});return r.json();}
+async function appsScriptFetch(p){const u=CONFIG.APPS_SCRIPT_URL+"?"+new URLSearchParams(p);const r=await fetch(u,{redirect:"follow",mode:"cors"});return r.json();}
+// Apps Script não suporta POST com body JSON via CORS de páginas externas.
+// A solução é enviar tudo como parâmetros GET — funciona perfeitamente para payloads de inscrição.
+async function appsScriptPost(d){const u=CONFIG.APPS_SCRIPT_URL+"?"+new URLSearchParams(d);const r=await fetch(u,{redirect:"follow",mode:"cors"});return r.json();}
 function showAlert(t,m){document.getElementById("alertBox").innerHTML=`<div class="alert alert-${t}">${m}</div>`;}
 function clearAlert(){document.getElementById("alertBox").innerHTML="";}
 function renderQR(id,text,size){const el=document.getElementById(id);if(!el)return;el.innerHTML="";new QRCode(el,{text,width:size,height:size,correctLevel:QRCode.CorrectLevel.H});}
@@ -310,9 +312,9 @@ function qrToDataURL(id){const img=document.querySelector("#"+id+" img");if(img)
 
 // ===== DEMO EVENTS =====
 const DEMO_EVENTS = {
-  ev001:{id:"ev001",titulo:"Curso de Audiometria Clínica",data:"15/08/2025",horario:"08:00 – 17:00",local:"Online (Zoom)",vagas:40,inscritos:18,certificado:true,gratuito:false,valorInscricao:120},
-  ev002:{id:"ev002",titulo:"Workshop: Reabilitação Auditiva",data:"22/08/2025",horario:"13:00 – 18:00",local:"São Paulo – SP",vagas:25,inscritos:10,certificado:true,gratuito:true,valorInscricao:0},
-  ev003:{id:"ev003",titulo:"Jornada de Fonoaudiologia 2025",data:"05/09/2025",horario:"08:00 – 18:00",local:"Recife – PE",vagas:100,inscritos:47,certificado:true,gratuito:false,valorInscricao:200},
+  ev001:{id:"ev001",titulo:"Curso de Audiometria Clínica",data:"15/08/2025",horario:"08:00 – 17:00",local:"Online (Zoom)",vagas:40,inscritos:18,certificado:true},
+  ev002:{id:"ev002",titulo:"Workshop: Reabilitação Auditiva",data:"22/08/2025",horario:"13:00 – 18:00",local:"São Paulo – SP",vagas:25,inscritos:10,certificado:true},
+  ev003:{id:"ev003",titulo:"Jornada de Fonoaudiologia 2025",data:"05/09/2025",horario:"08:00 – 18:00",local:"Recife – PE",vagas:100,inscritos:47,certificado:true},
 };
 
 let evento = null;
@@ -374,25 +376,6 @@ async function loadEvent() {
   document.getElementById("heroTitle").textContent = evento.titulo;
   document.getElementById("heroSub").textContent =
     `📅 ${evento.data}  🕐 ${evento.horario}  📍 ${evento.local}`;
-
-  // Badge de inscrição gratuita ou paga
-  const pago = evento.gratuito === false || evento.gratuito === "false";
-  const valorBadge = pago
-    ? `<span style="display:inline-flex;align-items:center;gap:.3rem;background:rgba(255,255,255,.18);color:#fff;padding:.25rem .75rem;border-radius:99px;font-size:.82rem;font-weight:600;margin-top:.5rem;">💳 Inscrição: R$ ${Number(evento.valorInscricao||0).toFixed(2)}</span>`
-    : `<span style="display:inline-flex;align-items:center;gap:.3rem;background:rgba(255,255,255,.18);color:#fff;padding:.25rem .75rem;border-radius:99px;font-size:.82rem;font-weight:600;margin-top:.5rem;">🆓 Inscrição gratuita</span>`;
-  const badgeEl = document.createElement("div");
-  badgeEl.style.marginTop = ".5rem";
-  badgeEl.innerHTML = valorBadge;
-  document.querySelector(".page-hero").appendChild(badgeEl);
-
-  // Aviso de pagamento externo (só para eventos pagos)
-  if (pago) {
-    const aviso = document.createElement("div");
-    aviso.style.cssText = "background:var(--amber-50);border-left:4px solid var(--amber-500);color:#92400e;padding:.75rem 1rem;border-radius:8px;font-size:.85rem;margin-bottom:1rem;";
-    aviso.innerHTML = `⚠️ <strong>Evento pago — R$ ${Number(evento.valorInscricao||0).toFixed(2)}</strong>. Após se inscrever, o pagamento deve ser realizado via PIX ou link enviado por e-mail. Sua vaga será confirmada após a verificação do pagamento.`;
-    document.getElementById("alertBox").before(aviso);
-  }
-
   document.getElementById("pageLoading").style.display = "none";
   document.getElementById("pageContent").style.display = "block";
 }

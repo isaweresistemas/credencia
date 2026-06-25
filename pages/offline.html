@@ -10435,7 +10435,9 @@ async function callGet(params) {
 }
 
 async function callPost(body) {
-  const res = await fetch(getUrl(), { method: "POST", body: JSON.stringify(body) });
+  // Envia como GET com o payload serializado em JSON num parâmetro — evita CORS
+  const u = getUrl() + "?" + new URLSearchParams({ ...body, alteracoes: JSON.stringify(body.alteracoes || []) });
+  const res = await fetch(u, { redirect: "follow", mode: "cors" });
   return res.json();
 }
 

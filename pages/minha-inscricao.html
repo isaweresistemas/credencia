@@ -123,8 +123,8 @@ const CONFIG = { APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbySSI
 function formatCPF(v){v=v.replace(/\D/g,"");if(v.length>11)v=v.slice(0,11);return v.replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");}
 function validCPF(c){c=c.replace(/\D/g,"");if(c.length!==11||/^(\d)\1+$/.test(c))return false;let s=0;for(let i=0;i<9;i++)s+=+c[i]*(10-i);let r=s%11<2?0:11-s%11;if(r!==+c[9])return false;s=0;for(let i=0;i<10;i++)s+=+c[i]*(11-i);r=s%11<2?0:11-s%11;return r===+c[10];}
 function validEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);}
-async function appsScriptFetch(p){const u=CONFIG.APPS_SCRIPT_URL+"?"+new URLSearchParams(p);const r=await fetch(u,{redirect:"follow"});return r.json();}
-async function appsScriptPost(d){const r=await fetch(CONFIG.APPS_SCRIPT_URL,{method:"POST",redirect:"follow",body:JSON.stringify(d)});return r.json();}
+async function appsScriptFetch(p){const u=CONFIG.APPS_SCRIPT_URL+"?"+new URLSearchParams(p);const r=await fetch(u,{redirect:"follow",mode:"cors"});return r.json();}
+async function appsScriptPost(d){const u=CONFIG.APPS_SCRIPT_URL+"?"+new URLSearchParams(d);const r=await fetch(u,{redirect:"follow",mode:"cors"});return r.json();}
 function showAlert(t,m){document.getElementById("alertBox").innerHTML=`<div class="alert alert-${t}">${m}</div>`;}
 function clearAlert(){document.getElementById("alertBox").innerHTML="";}
 function renderQR(id,text,size){const el=document.getElementById(id);if(!el)return;el.innerHTML="";new QRCode(el,{text,width:size,height:size,correctLevel:QRCode.CorrectLevel.H});}

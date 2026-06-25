@@ -427,12 +427,12 @@ const modoDemo = CONFIG.APPS_SCRIPT_URL.includes("SEU_ID_AQUI");
 
 async function apiFetch(p){
   const u = CONFIG.APPS_SCRIPT_URL + "?" + new URLSearchParams(p);
-  const r = await fetch(u, { redirect: "follow" });
+  const r = await fetch(u);
   return r.json();
 }
 async function apiPost(d){
   const u = CONFIG.APPS_SCRIPT_URL + "?" + new URLSearchParams(d);
-  const r = await fetch(u, { redirect: "follow" });
+  const r = await fetch(u);
   return r.json();
 }
 

@@ -446,7 +446,7 @@ document.getElementById("btnConfirmar").addEventListener("click", async () => {
         const url = qrToDataURL("qrcode");
         if(!url) return;
         const a = document.createElement("a");
-        a.href = url; a.download = `qrcode-${codigo}.png`; a.click();
+        a.href = url; a.download = `qrcode-${codigo}.png`; a.click(); 
       }, 300);
     });
 

@@ -294,7 +294,7 @@
 <script>
 // ===== CONFIG =====
 const CONFIG = { APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbySSIglvimz5jN4MbdY38Dwsn1Tg5AErRMEHw5c1u5cZy9mJryN-wq9two0S8OeBeRH/exec" };
-const modoDemo = CONFIG.APPS_SCRIPT_URL.includes("SEU_ID_AQUI");" };
+const modoDemo = CONFIG.APPS_SCRIPT_URL.includes("SEU_ID_AQUI");
 
 // ===== UTILS =====
 function formatCPF(v){v=v.replace(/\D/g,"");if(v.length>11)v=v.slice(0,11);return v.replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");}
@@ -306,7 +306,6 @@ async function appsScriptFetch(p){const u=CONFIG.APPS_SCRIPT_URL+"?"+new URLSear
 // Apps Script não suporta POST com body JSON via CORS de páginas externas.
 // A solução é enviar tudo como parâmetros GET — funciona perfeitamente para payloads de inscrição.
 async function appsScriptPost(d){const u=CONFIG.APPS_SCRIPT_URL+"?"+new URLSearchParams(d);const r=await fetch(u,{redirect:"follow"});return r.json();}
-3 — admin.html —
 function showAlert(t,m){document.getElementById("alertBox").innerHTML=`<div class="alert alert-${t}">${m}</div>`;}
 function clearAlert(){document.getElementById("alertBox").innerHTML="";}
 function renderQR(id,text,size){const el=document.getElementById(id);if(!el)return;el.innerHTML="";new QRCode(el,{text,width:size,height:size,correctLevel:QRCode.CorrectLevel.H});}

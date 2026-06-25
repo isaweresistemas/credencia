@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Painel Administrativo — Isawere Credencia</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@700;800&display=swap');
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',system-ui,sans-serif;background:#f8fafc;color:#1e293b;line-height:1.55;}
+    :root{
+      --blue-50:#eff6ff;--blue-100:#dbeafe;--blue-600:#2563eb;--blue-700:#1d4ed8;
+      --gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-300:#cbd5e1;
+      --gray-400:#94a3b8;--gray-500:#64748b;--gray-700:#334155;--gray-900:#0f172a;
+      --green-50:#f0fdf4;--green-500:#22c55e;--green-700:#15803d;
+      --red-50:#fef2f2;--red-500:#ef4444;--red-700:#b91c1c;
+      --amber-50:#fffbeb;--amber-500:#f59e0b;--amber-700:#92400e;
+      --purple-50:#faf5ff;--purple-600:#9333ea;
+      --radius:12px;--shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+    }
+    .container{max-width:980px;margin:0 auto;padding:1.5rem 1rem 3rem;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;}
+    .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;}
+    @media(max-width:700px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr 1fr;}}
+    @media(max-width:480px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}}
+
+    /* Header */
+    .site-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;background:#fff;border-bottom:1px solid var(--gray-100);position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+    .logo{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:800;color:var(--gray-900);text-decoration:none;display:flex;align-items:center;gap:.35rem;}
+    .logo span{color:var(--blue-600);}
+    .header-nav{display:flex;gap:.1rem;}
+    .header-nav a{font-size:.82rem;font-weight:500;color:var(--gray-500);text-decoration:none;padding:.4rem .65rem;border-radius:6px;transition:background .15s,color .15s;}
+    .header-nav a:hover,.header-nav a.active{background:var(--blue-50);color:var(--blue-600);}
+
+    .page-hero{background:linear-gradient(135deg,var(--blue-600),var(--blue-700));color:#fff;padding:2rem 1.25rem 2.25rem;text-align:center;}
+    .page-hero h1{font-family:'Sora',sans-serif;font-size:1.55rem;font-weight:800;margin-bottom:.4rem;}
+    .page-hero p{font-size:.93rem;opacity:.88;}
+
+    /* Cards */
+    .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.25rem;margin-bottom:1rem;}
+    .card-title{font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;color:var(--gray-900);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+
+    /* Forms */
+    .form-group{margin-bottom:.9rem;}
+    .form-group label{display:block;font-size:.83rem;font-weight:600;color:var(--gray-700);margin-bottom:.35rem;}
+    input,select,textarea{width:100%;padding:.6rem .75rem;font-size:.9rem;font-family:inherit;border:1.5px solid var(--gray-200);border-radius:8px;background:#fff;color:var(--gray-900);outline:none;transition:border-color .15s,box-shadow .15s;}
+    input:focus,select:focus,textarea:focus{border-color:var(--blue-600);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
+    textarea{resize:vertical;}
+    input[type=checkbox]{width:auto;}
+
+    /* Buttons */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.6rem 1.1rem;font-size:.88rem;font-weight:600;font-family:inherit;border-radius:8px;border:1.5px solid transparent;cursor:pointer;text-decoration:none;transition:all .15s;}
+    .btn:disabled{opacity:.55;cursor:not-allowed;}
+    .btn-primary{background:var(--blue-600);color:#fff;border-color:var(--blue-600);}
+    .btn-primary:hover:not(:disabled){background:var(--blue-700);}
+    .btn-success{background:#16a34a;color:#fff;border-color:#16a34a;}
+    .btn-success:hover:not(:disabled){background:#15803d;}
+    .btn-danger{background:var(--red-500);color:#fff;border-color:var(--red-500);}
+    .btn-danger:hover:not(:disabled){background:var(--red-700);}
+    .btn-outline{background:#fff;color:var(--gray-700);border-color:var(--gray-200);}
+    .btn-outline:hover:not(:disabled){background:var(--gray-50);}
+    .btn-sm{padding:.3rem .65rem;font-size:.78rem;}
+    .btn-full{width:100%;}
+
+    /* Alerts */
+    .alert{padding:.75rem 1rem;border-radius:8px;font-size:.88rem;margin-bottom:.75rem;border-left:4px solid;}
+    .alert-error{background:var(--red-50);color:var(--red-700);border-color:var(--red-500);}
+    .alert-success{background:var(--green-50);color:var(--green-700);border-color:var(--green-500);}
+    .alert-warning{background:var(--amber-50);color:var(--amber-700);border-color:var(--amber-500);}
+
+    /* Badges */
+    .badge{display:inline-flex;align-items:center;gap:.25rem;padding:.2rem .55rem;border-radius:99px;font-size:.73rem;font-weight:600;}
+    .badge-green{background:var(--green-50);color:var(--green-700);}
+    .badge-red{background:var(--red-50);color:var(--red-700);}
+    .badge-amber{background:var(--amber-50);color:var(--amber-700);}
+    .badge-blue{background:var(--blue-50);color:var(--blue-700);}
+    .badge-purple{background:var(--purple-50);color:var(--purple-600);}
+
+    /* Tables */
+    .tbl{width:100%;border-collapse:collapse;font-size:.86rem;}
+    .tbl th{text-align:left;padding:.5rem .65rem;background:var(--gray-100);color:var(--gray-500);font-weight:600;font-size:.72rem;text-transform:uppercase;white-space:nowrap;}
+    .tbl td{padding:.5rem .65rem;border-bottom:1px solid var(--gray-100);vertical-align:middle;}
+    .tbl tr:last-child td{border-bottom:none;}
+    .tbl .acoes{display:flex;gap:.35rem;flex-wrap:wrap;}
+
+    /* Tabs */
+    .tabs{display:flex;gap:.15rem;border-bottom:2px solid var(--gray-100);margin-bottom:1.25rem;flex-wrap:wrap;}
+    .tab{padding:.55rem 1rem;font-size:.88rem;font-weight:600;color:var(--gray-500);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;font-family:inherit;}
+    .tab.active{color:var(--blue-600);border-bottom-color:var(--blue-600);}
+    .tab-panel{display:none;}
+    .tab-panel.active{display:block;}
+
+    /* Stat cards */
+    .stat-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem 1.1rem;display:flex;flex-direction:column;gap:.25rem;}
+    .stat-card .stat-label{font-size:.78rem;color:var(--gray-500);font-weight:500;}
+    .stat-card .stat-value{font-family:'Sora',sans-serif;font-size:1.7rem;font-weight:800;color:var(--gray-900);line-height:1.1;}
+    .stat-card .stat-sub{font-size:.78rem;color:var(--gray-500);}
+
+    /* Progress bar */
+    .progress{background:var(--gray-100);border-radius:99px;height:7px;overflow:hidden;}
+    .progress-bar{height:7px;border-radius:99px;background:var(--blue-600);transition:width .4s;}
+
+    .divider{border:none;border-top:1px solid var(--gray-100);margin:1rem 0;}
+    .spinner{display:inline-block;width:18px;height:18px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .section-title{font-family:'Sora',sans-serif;font-weight:800;font-size:1.05rem;color:var(--gray-900);display:flex;align-items:center;gap:.5rem;}
+
+    /* Lock screen */
+    #lockScreen{max-width:380px;margin:4rem auto;}
+
+    /* Modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;}
+    .modal{background:#fff;border-radius:var(--radius);box-shadow:0 20px 50px rgba(0,0,0,.2);max-width:520px;width:100%;max-height:90vh;overflow-y:auto;padding:1.5rem;}
+    .modal-title{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;}
+    .modal-title .close-btn{background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--gray-500);line-height:1;}
+
+    /* Valor inscricao toggle */
+    #valorBox{display:none;}
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo" href="../index.html">🎓 <span>Isawere</span> Credencia</a>
+  <nav class="header-nav">
+    <a href="../index.html">Eventos</a>
+    <a href="validar.html">Validar Presença</a>
+    <a href="certificado.html">Certificado</a>
+    <a href="offline.html">📡 Offline</a>
+  </nav>
+</header>
+
+<div class="page-hero">
+  <h1>Painel Administrativo</h1>
+  <p>Eventos, inscritos, estatísticas e modelos de certificado.</p>
+</div>
+
+<div class="container">
+
+  <!-- ==================== TELA DE LOGIN ==================== -->
+  <div id="lockScreen" class="card">
+    <div class="card-title">🔒 Acesso restrito</div>
+    <div class="form-group">
+      <label>PIN de administrador</label>
+      <input id="pinInput" type="password" placeholder="PIN" autocomplete="off" />
+    </div>
+    <div id="lockAlert"></div>
+    <button class="btn btn-primary btn-full" id="btnEntrar">Entrar</button>
+  </div>
+
+  <!-- ==================== PAINEL ==================== -->
+  <div id="painel" style="display:none;">
+
+    <div id="alertBox"></div>
+
+    <!-- ABAS PRINCIPAIS -->
+    <div class="tabs">
+      <button class="tab active" data-tab="eventos">📋 Eventos</button>
+      <button class="tab" data-tab="inscritos">👥 Inscritos</button>
+      <button class="tab" data-tab="estatisticas">📊 Estatísticas</button>
+      <button class="tab" data-tab="certificados">🎓 Certificados</button>
+    </div>
+
+    <!-- ===== ABA: EVENTOS ===== -->
+    <div id="tab-eventos" class="tab-panel active">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;">
+        <p class="section-title" style="margin:0;">📋 Eventos cadastrados</p>
+        <button class="btn btn-primary" id="btnNovoEvento">➕ Novo evento</button>
+      </div>
+
+      <div class="card" style="padding:0;overflow-x:auto;">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Data</th>
+              <th>Vagas</th>
+              <th>Inscrição</th>
+              <th>Cert.</th>
+              <th>Pub.</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="eventosBody"></tbody>
+        </table>
+      </div>
+
+      <!-- FORM CRIAR/EDITAR EVENTO -->
+      <div class="card" id="formCard" style="display:none;margin-top:1.25rem;">
+        <div class="card-title" id="formTitle">➕ Novo evento</div>
+        <input type="hidden" id="fId" />
+
+        <div class="form-group">
+          <label>Título *</label>
+          <input id="fTitulo" type="text" placeholder="Ex.: Curso de Audiometria Clínica" />
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Data *</label>
+            <input id="fData" type="text" placeholder="dd/mm/aaaa" />
+          </div>
+          <div class="form-group">
+            <label>Horário *</label>
+            <input id="fHorario" type="text" placeholder="08:00 – 17:00" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Local *</label>
+            <input id="fLocal" type="text" placeholder="Online (Zoom) ou cidade – UF" />
+          </div>
+          <div class="form-group">
+            <label>Vagas *</label>
+            <input id="fVagas" type="number" min="1" placeholder="40" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Descrição</label>
+          <textarea id="fDescricao" rows="3" placeholder="Resumo do evento exibido na listagem"></textarea>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Carga horária (certificado)</label>
+            <input id="fCargaHoraria" type="text" placeholder="8h" />
+          </div>
+          <div class="form-group" style="display:flex;flex-direction:column;gap:.6rem;justify-content:center;padding-top:.3rem;">
+            <label style="display:flex;align-items:center;gap:.5rem;font-weight:500;cursor:pointer;">
+              <input type="checkbox" id="fCertificado" /> Emite certificado
+            </label>
+            <label style="display:flex;align-items:center;gap:.5rem;font-weight:500;cursor:pointer;">
+              <input type="checkbox" id="fPublicado" checked /> Publicado (visível)
+            </label>
+          </div>
+        </div>
+
+        <!-- GRATUITO / PAGO -->
+        <div class="card" style="background:var(--gray-50);box-shadow:none;border:1.5px solid var(--gray-200);padding:1rem;margin-bottom:.9rem;">
+          <div class="card-title" style="margin-bottom:.75rem;font-size:.9rem;">💰 Tipo de inscrição</div>
+          <div style="display:flex;gap:1.5rem;margin-bottom:.75rem;flex-wrap:wrap;">
+            <label style="display:flex;align-items:center;gap:.5rem;font-weight:500;cursor:pointer;">
+              <input type="radio" name="tipoInscricao" id="rGratuito" value="gratuito" checked /> Gratuito
+            </label>
+            <label style="display:flex;align-items:center;gap:.5rem;font-weight:500;cursor:pointer;">
+              <input type="radio" name="tipoInscricao" id="rPago" value="pago" /> Pago
+            </label>
+          </div>
+          <div id="valorBox" class="form-group" style="margin-bottom:0;">
+            <label>Valor da inscrição (R$) *</label>
+            <input id="fValorInscricao" type="number" min="0" step="0.01" placeholder="0,00" />
+            <p style="font-size:.78rem;color:var(--gray-500);margin-top:.3rem;">
+              ⚠️ Neste momento o sistema apenas registra o valor. A cobrança é feita externamente (PIX/link de pagamento) e você confirma a inscrição manualmente.
+            </p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>PIN de administrador *</label>
+          <input id="fPin" type="password" placeholder="PIN" autocomplete="off" />
+        </div>
+
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+          <button class="btn btn-outline" id="btnCancelarForm" style="flex:1;">Cancelar</button>
+          <button class="btn btn-success" id="btnSalvarEvento" style="flex:2;">💾 Salvar evento</button>
+        </div>
+      </div>
+    </div><!-- /tab-eventos -->
+
+    <!-- ===== ABA: INSCRITOS ===== -->
+    <div id="tab-inscritos" class="tab-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;">
+        <p class="section-title" style="margin:0;">👥 Inscritos</p>
+        <button class="btn btn-primary" id="btnNovaInscricao">➕ Adicionar inscrito</button>
+      </div>
+
+      <div class="card">
+        <div class="grid-2" style="margin-bottom:1rem;">
+          <div class="form-group" style="margin:0;">
+            <label>Filtrar por evento</label>
+            <select id="filtroEventoInscritos">
+              <option value="">Selecione um evento…</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label>Buscar por nome / CPF / código</label>
+            <input id="filtroBuscaInscritos" type="text" placeholder="Digite para filtrar…" />
+          </div>
+        </div>
+        <button class="btn btn-outline" id="btnCarregarInscritos" style="width:auto;">🔍 Carregar inscritos</button>
+      </div>
+
+      <div id="inscritosResultado"></div>
+    </div><!-- /tab-inscritos -->
+
+    <!-- ===== ABA: ESTATÍSTICAS ===== -->
+    <div id="tab-estatisticas" class="tab-panel">
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="grid-2" style="align-items:flex-end;gap:.75rem;">
+          <div class="form-group" style="margin:0;">
+            <label>Filtrar por evento (opcional)</label>
+            <select id="filtroEventoEstat">
+              <option value="">Todos os eventos</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" id="btnCarregarEstat" style="height:2.5rem;">📊 Atualizar</button>
+        </div>
+      </div>
+      <div id="estatisticasResultado"></div>
+    </div><!-- /tab-estatisticas -->
+
+    <!-- ===== ABA: CERTIFICADOS ===== -->
+    <div id="tab-certificados" class="tab-panel">
+      <div class="card">
+        <div class="card-title">🎓 Configurar modelo de certificado</div>
+        <p style="font-size:.88rem;color:var(--gray-500);margin-bottom:1rem;">
+          Selecione o evento, faça upload do PDF em branco e defina os campos. O modelo fica <strong>restrito ao admin</strong> — o participante apenas baixa o certificado gerado com seus dados.
+        </p>
+        <div class="form-group">
+          <label>Evento</label>
+          <select id="certEvento">
+            <option value="">Selecione um evento…</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+          <a id="btnAbrirCertificado" class="btn btn-primary" href="#" target="_blank" style="pointer-events:none;opacity:.5;">
+            🎓 Abrir configurador de certificado
+          </a>
+        </div>
+        <p style="font-size:.8rem;color:var(--gray-400);margin-top:.75rem;">
+          O configurador visual completo está em <code>certificado.html?evento=ID&amp;tab=configurar&amp;pin=SEU_PIN</code>
+        </p>
+      </div>
+    </div><!-- /tab-certificados -->
+
+  </div><!-- /painel -->
+
+</div><!-- /container -->
+
+<!-- ==================== MODAL: INSCRITO ==================== -->
+<div id="modalOverlay" class="modal-overlay" style="display:none;">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="modalTitle">Inscrito</span>
+      <button class="close-btn" id="btnFecharModal">✕</button>
+    </div>
+    <div id="modalAlertBox"></div>
+    <input type="hidden" id="mCodigo" />
+    <input type="hidden" id="mEventoId" />
+
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Nome *</label>
+        <input id="mNome" type="text" placeholder="Nome completo" />
+      </div>
+      <div class="form-group">
+        <label>CPF</label>
+        <input id="mCpf" type="text" placeholder="000.000.000-00" />
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>E-mail</label>
+        <input id="mEmail" type="email" placeholder="email@exemplo.com" />
+      </div>
+      <div class="form-group">
+        <label>Telefone</label>
+        <input id="mTelefone" type="text" placeholder="(00) 00000-0000" />
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Profissão</label>
+        <input id="mProfissao" type="text" placeholder="Fonoaudióloga" />
+      </div>
+      <div class="form-group">
+        <label>Registro</label>
+        <input id="mRegistro" type="text" placeholder="CRFa 12345" />
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Status</label>
+        <select id="mStatus">
+          <option value="Confirmado">✅ Confirmado</option>
+          <option value="Pendente">⏳ Pendente</option>
+          <option value="Cancelado">❌ Cancelado</option>
+          <option value="VIP">🌟 VIP</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Presença</label>
+        <select id="mPresenca">
+          <option value="Pendente">⏳ Pendente</option>
+          <option value="Presente">✅ Presente</option>
+          <option value="Ausente">❌ Ausente</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card" style="background:var(--gray-50);box-shadow:none;border:1.5px solid var(--gray-200);padding:.85rem;margin-bottom:.9rem;">
+      <p style="font-size:.8rem;font-weight:600;color:var(--gray-700);margin-bottom:.5rem;">Itens entregues na entrada</p>
+      <div style="display:flex;flex-wrap:wrap;gap:1rem;">
+        <label style="display:flex;align-items:center;gap:.4rem;font-size:.85rem;cursor:pointer;"><input type="checkbox" id="mBrinde" /> Brinde</label>
+        <label style="display:flex;align-items:center;gap:.4rem;font-size:.85rem;cursor:pointer;"><input type="checkbox" id="mAlimento" /> Kg de alimento</label>
+        <label style="display:flex;align-items:center;gap:.4rem;font-size:.85rem;cursor:pointer;"><input type="checkbox" id="mPresente" /> Presente</label>
+        <label style="display:flex;align-items:center;gap:.4rem;font-size:.85rem;cursor:pointer;"><input type="checkbox" id="mKit" /> Kit</label>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+      <button class="btn btn-outline" id="btnCancelarModal" style="flex:1;">Cancelar</button>
+      <button class="btn btn-success" id="btnSalvarModal" style="flex:2;">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+//  CONFIG
+// ================================================================
+const CONFIG = { APPS_SCRIPT_URL: "https://script.google.com/macros/s/SEU_ID_AQUI/exec" };
+const modoDemo = CONFIG.APPS_SCRIPT_URL.includes("SEU_ID_AQUI");
+
+async function apiFetch(p){
+  const u = CONFIG.APPS_SCRIPT_URL + "?" + new URLSearchParams(p);
+  const r = await fetch(u, { redirect: "follow" });
+  return r.json();
+}
+async function apiPost(d){
+  const r = await fetch(CONFIG.APPS_SCRIPT_URL, { method: "POST", redirect: "follow", body: JSON.stringify(d) });
+  return r.json();
+}
+
+function pinAtual(){ return sessionStorage.getItem("isawere_pin") || ""; }
+function showAlert(t, m, id="alertBox"){ const el=document.getElementById(id); if(el) el.innerHTML=`<div class="alert alert-${t}">${m}</div>`; }
+function clearAlert(id="alertBox"){ const el=document.getElementById(id); if(el) el.innerHTML=""; }
+function formatCPF(v){ v=v.replace(/\D/g,""); if(v.length>11)v=v.slice(0,11); return v.replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2"); }
+
+// ================================================================
+//  DADOS DEMO
+// ================================================================
+let DEMO_EVENTOS = [
+  { id:"ev001", titulo:"Curso de Audiometria Clínica", data:"15/08/2025", horario:"08:00–17:00", local:"Online (Zoom)", vagas:40, inscritos:18, descricao:"Capacitação prática.", certificado:true, cargaHoraria:"8h", publicado:true, gratuito:false, valorInscricao:120 },
+  { id:"ev002", titulo:"Workshop: Reabilitação Auditiva", data:"22/08/2025", horario:"13:00–18:00", local:"São Paulo – SP", vagas:25, inscritos:10, descricao:"Abordagem clínica moderna.", certificado:true, cargaHoraria:"5h", publicado:true, gratuito:true, valorInscricao:0 },
+  { id:"ev003", titulo:"Jornada de Fonoaudiologia 2025", data:"05/09/2025", horario:"08:00–18:00", local:"Recife – PE", vagas:100, inscritos:47, descricao:"Congresso.", certificado:true, cargaHoraria:"10h", publicado:false, gratuito:false, valorInscricao:200 },
+];
+let DEMO_INSCRITOS = [
+  { codigo:"ISW-DEMO01", eventoId:"ev001", nome:"Maria Silva Santos", cpf:"123.456.789-09", email:"demo@isawere.com.br", telefone:"(81) 99999-0001", profissao:"Fonoaudióloga", registro:"CRFa 12345", status:"Confirmado", presenca:"Presente", dataInscricao:"01/07/2025 14:32", brinde:true, alimentoKg:false, presenteEntregue:true, kit:true },
+  { codigo:"ISW-DEMO02", eventoId:"ev001", nome:"João Carlos Pereira", cpf:"987.654.321-00", email:"joao@email.com", telefone:"(11) 98888-0002", profissao:"Otorrinolaringologista", registro:"CRM 67890", status:"Confirmado", presenca:"Pendente", dataInscricao:"02/07/2025 09:10", brinde:false, alimentoKg:false, presenteEntregue:false, kit:false },
+  { codigo:"VIP-DEMO03", eventoId:"ev001", nome:"Dra. Ana Beatriz Lima", cpf:"", email:"ana@clinica.com", telefone:"", profissao:"Diretora Clínica", registro:"", status:"VIP", presenca:"Presente", dataInscricao:"15/08/2025 08:00", brinde:true, alimentoKg:true, presenteEntregue:true, kit:true },
+  { codigo:"ISW-DEMO04", eventoId:"ev002", nome:"Carlos Mendes", cpf:"111.222.333-44", email:"carlos@email.com", telefone:"(21) 97777-0003", profissao:"Fonoaudiólogo", registro:"CRFa 55555", status:"Confirmado", presenca:"Pendente", dataInscricao:"10/07/2025 11:20", brinde:false, alimentoKg:false, presenteEntregue:false, kit:false },
+];
+
+// ================================================================
+//  TABS
+// ================================================================
+document.querySelectorAll(".tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+  });
+});
+
+// ================================================================
+//  LOGIN
+// ================================================================
+const pinSalvo = sessionStorage.getItem("isawere_pin");
+if (pinSalvo) tentarEntrar(pinSalvo);
+
+document.getElementById("btnEntrar").addEventListener("click", () => tentarEntrar(document.getElementById("pinInput").value.trim()));
+document.getElementById("pinInput").addEventListener("keydown", e => { if(e.key==="Enter") document.getElementById("btnEntrar").click(); });
+
+async function tentarEntrar(pin) {
+  if (!pin) return;
+  document.getElementById("lockAlert").innerHTML = "";
+  try {
+    if (!modoDemo) {
+      const d = await apiFetch({ action: "listarEventosAdmin", pin });
+      if (d.erro) throw new Error(d.erro);
+    }
+    sessionStorage.setItem("isawere_pin", pin);
+    document.getElementById("lockScreen").style.display = "none";
+    document.getElementById("painel").style.display = "block";
+    await carregarEventos();
+    popularSelectEventos();
+  } catch(e) {
+    document.getElementById("lockAlert").innerHTML = `<div class="alert alert-error">${e.message || "PIN inválido."}</div>`;
+  }
+}
+
+// ================================================================
+//  EVENTOS — listar
+// ================================================================
+async function carregarEventos() {
+  const tbody = document.getElementById("eventosBody");
+  tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:1.5rem;"><span class="spinner"></span></td></tr>`;
+  let eventos = [];
+  try {
+    if (!modoDemo) {
+      const d = await apiFetch({ action: "listarEventosAdmin", pin: pinAtual() });
+      if (d.erro) throw new Error(d.erro);
+      eventos = d.eventos || [];
+    } else {
+      await new Promise(r => setTimeout(r, 400));
+      eventos = DEMO_EVENTOS;
+    }
+  } catch(e) {
+    showAlert("error", "Erro ao carregar eventos: " + e.message);
+    eventos = [];
+  }
+  window.__eventosCache = eventos;
+
+  if (!eventos.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:var(--gray-500);">Nenhum evento cadastrado ainda.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = eventos.map(ev => {
+    const pago = ev.gratuito === false || ev.gratuito === "false";
+    const inscricaoBadge = pago
+      ? `<span class="badge badge-amber">💳 R$ ${Number(ev.valorInscricao||0).toFixed(2)}</span>`
+      : `<span class="badge badge-green">🆓 Gratuito</span>`;
+    const pubBadge = (ev.publicado===false||ev.publicado==="Não")
+      ? `<span class="badge badge-red">Não</span>`
+      : `<span class="badge badge-green">Sim</span>`;
+    return `
+    <tr>
+      <td><strong>${ev.titulo}</strong><br><span style="font-size:.76rem;color:var(--gray-500);">${ev.local||""}</span></td>
+      <td>${ev.data}<br><span style="font-size:.76rem;color:var(--gray-500);">${ev.horario||""}</span></td>
+      <td>${ev.inscritos||0}/${ev.vagas}</td>
+      <td>${inscricaoBadge}</td>
+      <td>${ev.certificado?"✅":"—"}</td>
+      <td>${pubBadge}</td>
+      <td class="acoes">
+        <button class="btn btn-outline btn-sm" onclick="abrirEdicao('${ev.id}')">✏️ Editar</button>
+        <button class="btn btn-outline btn-sm" onclick="verInscritos('${ev.id}')">👥</button>
+        <button class="btn btn-outline btn-sm" onclick="exportarOffline('${ev.id}','${ev.titulo.replace(/'/g,"")}')">📦</button>
+        <button class="btn btn-outline btn-sm" style="color:var(--red-500);" onclick="excluirEvento('${ev.id}','${ev.titulo.replace(/'/g,"")}')">🗑️</button>
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+function popularSelectEventos() {
+  const eventos = window.__eventosCache || DEMO_EVENTOS;
+  const selects = ["filtroEventoInscritos","filtroEventoEstat","certEvento"];
+  selects.forEach(sid => {
+    const sel = document.getElementById(sid);
+    const val = sel.value;
+    sel.innerHTML = `<option value="">${sid==="certEvento"?"Selecione um evento…":"Todos os eventos"}</option>`;
+    eventos.forEach(ev => {
+      const opt = document.createElement("option");
+      opt.value = ev.id; opt.textContent = ev.titulo;
+      sel.appendChild(opt);
+    });
+    if (val) sel.value = val;
+  });
+}
+
+// ================================================================
+//  FORM CRIAR/EDITAR EVENTO
+// ================================================================
+document.getElementById("btnNovoEvento").addEventListener("click", () => abrirForm(null));
+document.getElementById("btnCancelarForm").addEventListener("click", () => { document.getElementById("formCard").style.display="none"; });
+
+// Toggle valor
+document.querySelectorAll("input[name='tipoInscricao']").forEach(r => {
+  r.addEventListener("change", () => {
+    document.getElementById("valorBox").style.display = document.getElementById("rPago").checked ? "block" : "none";
+  });
+});
+
+function abrirForm(ev) {
+  document.getElementById("formTitle").textContent = ev ? "✏️ Editar evento" : "➕ Novo evento";
+  document.getElementById("fId").value           = ev?.id || "";
+  document.getElementById("fTitulo").value        = ev?.titulo || "";
+  document.getElementById("fData").value          = ev?.data || "";
+  document.getElementById("fHorario").value       = ev?.horario || "";
+  document.getElementById("fLocal").value         = ev?.local || "";
+  document.getElementById("fVagas").value         = ev?.vagas || "";
+  document.getElementById("fDescricao").value     = ev?.descricao || "";
+  document.getElementById("fCargaHoraria").value  = ev?.cargaHoraria || "";
+  document.getElementById("fCertificado").checked = ev ? !!ev.certificado : false;
+  document.getElementById("fPublicado").checked   = ev ? !(ev.publicado===false||ev.publicado==="Não") : true;
+  document.getElementById("fPin").value           = pinAtual();
+
+  // Gratuito/pago
+  const pago = ev && (ev.gratuito===false || ev.gratuito==="false");
+  document.getElementById(pago ? "rPago" : "rGratuito").checked = true;
+  document.getElementById("fValorInscricao").value = ev?.valorInscricao || "";
+  document.getElementById("valorBox").style.display = pago ? "block" : "none";
+
+  document.getElementById("formCard").style.display = "block";
+  document.getElementById("formCard").scrollIntoView({ behavior: "smooth" });
+}
+
+function abrirEdicao(id) {
+  const ev = (window.__eventosCache||[]).find(e => String(e.id)===String(id));
+  if (ev) abrirForm(ev);
+}
+
+document.getElementById("btnSalvarEvento").addEventListener("click", async () => {
+  const id           = document.getElementById("fId").value;
+  const titulo       = document.getElementById("fTitulo").value.trim();
+  const data         = document.getElementById("fData").value.trim();
+  const horario      = document.getElementById("fHorario").value.trim();
+  const local        = document.getElementById("fLocal").value.trim();
+  const vagas        = +document.getElementById("fVagas").value;
+  const descricao    = document.getElementById("fDescricao").value.trim();
+  const cargaHoraria = document.getElementById("fCargaHoraria").value.trim();
+  const certificado  = document.getElementById("fCertificado").checked;
+  const publicado    = document.getElementById("fPublicado").checked;
+  const pin          = document.getElementById("fPin").value.trim();
+  const gratuito     = document.getElementById("rGratuito").checked;
+  const valorInscricao = gratuito ? 0 : parseFloat(document.getElementById("fValorInscricao").value || 0);
+
+  if (!titulo||!data||!horario||!local||!vagas) { showAlert("error","Preencha todos os campos obrigatórios (*)."); return; }
+  if (!pin) { showAlert("error","Informe o PIN de administrador."); return; }
+  if (!gratuito && valorInscricao <= 0) { showAlert("error","Informe um valor de inscrição válido."); return; }
+
+  const btn = document.getElementById("btnSalvarEvento");
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Salvando…';
+
+  const payload = { titulo, data, horario, local, vagas, descricao, cargaHoraria, certificado, publicado, pin, gratuito, valorInscricao };
+  try {
+    if (!modoDemo) {
+      const d = id
+        ? await apiPost({ action:"editarEvento", id, ...payload })
+        : await apiPost({ action:"criarEvento", ...payload });
+      if (d.erro) throw new Error(d.erro);
+    } else {
+      if (id) { const ev = DEMO_EVENTOS.find(e=>e.id===id); Object.assign(ev, payload); }
+      else DEMO_EVENTOS.push({ id:"ev"+Date.now().toString(36), inscritos:0, ...payload });
+    }
+    sessionStorage.setItem("isawere_pin", pin);
+    document.getElementById("formCard").style.display="none";
+    showAlert("success","✅ Evento salvo com sucesso.");
+    await carregarEventos();
+    popularSelectEventos();
+  } catch(e) {
+    showAlert("error","Erro ao salvar: "+e.message);
+  } finally {
+    btn.disabled=false; btn.innerHTML="💾 Salvar evento";
+  }
+});
+
+async function excluirEvento(id, titulo) {
+  if (!confirm(`Excluir o evento "${titulo}"? Essa ação não pode ser desfeita.`)) return;
+  try {
+    if (!modoDemo) {
+      const d = await apiPost({ action:"excluirEvento", id, pin:pinAtual() });
+      if (d.erro) throw new Error(d.erro);
+    } else {
+      DEMO_EVENTOS = DEMO_EVENTOS.filter(e=>e.id!==id);
+    }
+    showAlert("success","✅ Evento excluído.");
+    await carregarEventos();
+    popularSelectEventos();
+  } catch(e) {
+    showAlert("error","Erro ao excluir: "+e.message);
+  }
+}
+
+async function exportarOffline(id, titulo) {
+  if (modoDemo) { showAlert("warning","Configure o Apps Script para exportar o pacote offline real."); return; }
+  try {
+    const d = await apiFetch({ action:"exportarEventoOffline", eventoId:id, pin:pinAtual() });
+    if (d.erro) throw new Error(d.erro);
+    const blob = new Blob([JSON.stringify(d.pacote,null,2)], { type:"application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = `offline-${id}.json`; a.click();
+    showAlert("success",`✅ Pacote offline de "${titulo}" baixado.`);
+  } catch(e) {
+    showAlert("error","Erro ao exportar: "+e.message);
+  }
+}
+
+// Atalho: clique em ícone de inscritos na tabela de eventos
+function verInscritos(eventoId) {
+  document.querySelector(".tab[data-tab='inscritos']").click();
+  document.getElementById("filtroEventoInscritos").value = eventoId;
+  carregarInscritos();
+}
+
+// ================================================================
+//  INSCRITOS — listar
+// ================================================================
+document.getElementById("btnCarregarInscritos").addEventListener("click", carregarInscritos);
+
+async function carregarInscritos() {
+  const eventoId = document.getElementById("filtroEventoInscritos").value;
+  if (!eventoId) { showAlert("warning","Selecione um evento primeiro.", "alertBox"); return; }
+
+  const container = document.getElementById("inscritosResultado");
+  container.innerHTML = `<div style="text-align:center;padding:2rem;"><span class="spinner"></span></div>`;
+
+  let inscritos = [];
+  try {
+    if (!modoDemo) {
+      const d = await apiFetch({ action:"listarInscricoesAdmin", eventoId, pin:pinAtual() });
+      if (d.erro) throw new Error(d.erro);
+      inscritos = d.inscricoes || [];
+    } else {
+      await new Promise(r=>setTimeout(r,400));
+      inscritos = DEMO_INSCRITOS.filter(i=>i.eventoId===eventoId);
+    }
+  } catch(e) {
+    container.innerHTML = `<div class="alert alert-error">Erro ao carregar inscritos: ${e.message}</div>`;
+    return;
+  }
+
+  window.__inscritosCache = inscritos;
+  renderInscritos(inscritos, eventoId);
+}
+
+function renderInscritos(inscritos, eventoId) {
+  const busca = document.getElementById("filtroBuscaInscritos").value.toLowerCase();
+  const filtrados = busca
+    ? inscritos.filter(i =>
+        i.nome?.toLowerCase().includes(busca) ||
+        i.cpf?.includes(busca) ||
+        i.codigo?.toLowerCase().includes(busca)
+      )
+    : inscritos;
+
+  const container = document.getElementById("inscritosResultado");
+
+  if (!filtrados.length) {
+    container.innerHTML = `<div class="card" style="text-align:center;padding:2rem;color:var(--gray-500);">Nenhum inscrito encontrado.</div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="card" style="padding:0;overflow-x:auto;">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Status</th>
+            <th>Presença</th>
+            <th>Itens</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtrados.map(i => {
+            const statusBadge = {Confirmado:'<span class="badge badge-green">✅ Confirmado</span>',Cancelado:'<span class="badge badge-red">❌ Cancelado</span>',Pendente:'<span class="badge badge-amber">⏳ Pendente</span>',VIP:'<span class="badge badge-purple">🌟 VIP</span>'}[i.status]||i.status;
+            const presencaBadge = {Presente:'<span class="badge badge-green">✅</span>',Ausente:'<span class="badge badge-red">❌</span>',Pendente:'<span class="badge badge-amber">⏳</span>'}[i.presenca]||i.presenca;
+            const itens = [i.brinde&&'🎁',i.alimentoKg&&'🌾',(i.presenteEntregue||i.presente)&&'🎀',i.kit&&'📦'].filter(Boolean).join(" ");
+            return `
+            <tr>
+              <td><code style="font-size:.78rem;">${i.codigo}</code></td>
+              <td><strong>${i.nome}</strong><br><span style="font-size:.76rem;color:var(--gray-500);">${i.email||""}</span></td>
+              <td style="font-size:.82rem;">${i.cpf||"—"}</td>
+              <td>${statusBadge}</td>
+              <td>${presencaBadge}</td>
+              <td style="font-size:1rem;">${itens||"—"}</td>
+              <td class="acoes">
+                <button class="btn btn-outline btn-sm" onclick="abrirModalInscrito('${i.codigo}','${eventoId}')">✏️</button>
+                <button class="btn btn-outline btn-sm" style="color:var(--red-500);" onclick="excluirInscrito('${i.codigo}')">🗑️</button>
+              </td>
+            </tr>`;
+          }).join("")}
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:.82rem;color:var(--gray-500);margin-top:.5rem;text-align:right;">${filtrados.length} inscrito(s)</p>`;
+}
+
+// Filtro em tempo real
+document.getElementById("filtroBuscaInscritos").addEventListener("input", () => {
+  const inscritos = window.__inscritosCache;
+  if (inscritos) renderInscritos(inscritos, document.getElementById("filtroEventoInscritos").value);
+});
+
+// ================================================================
+//  MODAL INSCRITO (criar/editar)
+// ================================================================
+document.getElementById("btnFecharModal").addEventListener("click", fecharModal);
+document.getElementById("btnCancelarModal").addEventListener("click", fecharModal);
+document.getElementById("btnNovaInscricao").addEventListener("click", () => {
+  const eventoId = document.getElementById("filtroEventoInscritos").value;
+  if (!eventoId) { showAlert("warning","Selecione um evento primeiro."); return; }
+  abrirModalInscrito(null, eventoId);
+});
+document.getElementById("mCpf").addEventListener("input", function(){ this.value = formatCPF(this.value); });
+
+function fecharModal() { document.getElementById("modalOverlay").style.display="none"; }
+
+function abrirModalInscrito(codigo, eventoId) {
+  const i = codigo ? (window.__inscritosCache||DEMO_INSCRITOS).find(x=>x.codigo===codigo) : null;
+  document.getElementById("modalTitle").textContent = i ? `✏️ Editar — ${i.nome}` : "➕ Novo inscrito";
+  document.getElementById("mCodigo").value    = i?.codigo || "";
+  document.getElementById("mEventoId").value  = eventoId || "";
+  document.getElementById("mNome").value      = i?.nome || "";
+  document.getElementById("mCpf").value       = i?.cpf || "";
+  document.getElementById("mEmail").value     = i?.email || "";
+  document.getElementById("mTelefone").value  = i?.telefone || "";
+  document.getElementById("mProfissao").value = i?.profissao || "";
+  document.getElementById("mRegistro").value  = i?.registro || "";
+  document.getElementById("mStatus").value    = i?.status || "Confirmado";
+  document.getElementById("mPresenca").value  = i?.presenca || "Pendente";
+  document.getElementById("mBrinde").checked  = !!(i?.brinde);
+  document.getElementById("mAlimento").checked = !!(i?.alimentoKg);
+  document.getElementById("mPresente").checked = !!(i?.presenteEntregue || i?.presente);
+  document.getElementById("mKit").checked     = !!(i?.kit);
+  clearAlert("modalAlertBox");
+  document.getElementById("modalOverlay").style.display = "flex";
+}
+
+document.getElementById("btnSalvarModal").addEventListener("click", async () => {
+  const codigo   = document.getElementById("mCodigo").value;
+  const eventoId = document.getElementById("mEventoId").value;
+  const nome     = document.getElementById("mNome").value.trim();
+  const cpf      = document.getElementById("mCpf").value.trim();
+  const email    = document.getElementById("mEmail").value.trim();
+  const telefone = document.getElementById("mTelefone").value.trim();
+  const profissao= document.getElementById("mProfissao").value.trim();
+  const registro = document.getElementById("mRegistro").value.trim();
+  const status   = document.getElementById("mStatus").value;
+  const presenca = document.getElementById("mPresenca").value;
+  const brinde   = document.getElementById("mBrinde").checked;
+  const alimentoKg = document.getElementById("mAlimento").checked;
+  const presenteEntregue = document.getElementById("mPresente").checked;
+  const kit      = document.getElementById("mKit").checked;
+  const pin      = pinAtual();
+
+  if (!nome) { showAlert("error","Nome é obrigatório.","modalAlertBox"); return; }
+
+  const btn = document.getElementById("btnSalvarModal");
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Salvando…';
+
+  try {
+    if (!modoDemo) {
+      let d;
+      if (codigo) {
+        d = await apiPost({ action:"editarInscricao", codigo, nome, cpf, email, telefone, profissao, registro, status, presenca, brinde, alimentoKg, presenteEntregue, kit, pin });
+      } else {
+        d = await apiPost({ action:"criarInscricaoAdmin", eventoId, nome, cpf, email, telefone, profissao, registro, status, presenca, pin });
+      }
+      if (d.erro) throw new Error(d.erro);
+    } else {
+      // Demo
+      if (codigo) {
+        const idx = DEMO_INSCRITOS.findIndex(x=>x.codigo===codigo);
+        if (idx>-1) Object.assign(DEMO_INSCRITOS[idx], { nome,cpf,email,telefone,profissao,registro,status,presenca,brinde,alimentoKg,presenteEntregue,kit });
+      } else {
+        const novoCodigo = "ISW-" + Date.now().toString(36).toUpperCase();
+        DEMO_INSCRITOS.push({ codigo:novoCodigo, eventoId, nome, cpf, email, telefone, profissao, registro, status, presenca, dataInscricao: new Date().toLocaleString("pt-BR"), brinde, alimentoKg, presenteEntregue, kit });
+      }
+    }
+    fecharModal();
+    await carregarInscritos();
+  } catch(e) {
+    showAlert("error","Erro: "+e.message,"modalAlertBox");
+  } finally {
+    btn.disabled=false; btn.innerHTML="💾 Salvar";
+  }
+});
+
+async function excluirInscrito(codigo) {
+  if (!confirm(`Excluir inscrito ${codigo}? Essa ação não pode ser desfeita.`)) return;
+  try {
+    if (!modoDemo) {
+      const d = await apiPost({ action:"excluirInscricao", codigo, pin:pinAtual() });
+      if (d.erro) throw new Error(d.erro);
+    } else {
+      const idx = DEMO_INSCRITOS.findIndex(x=>x.codigo===codigo);
+      if (idx>-1) DEMO_INSCRITOS.splice(idx,1);
+    }
+    await carregarInscritos();
+  } catch(e) {
+    showAlert("error","Erro ao excluir: "+e.message);
+  }
+}
+
+// ================================================================
+//  ESTATÍSTICAS
+// ================================================================
+document.getElementById("btnCarregarEstat").addEventListener("click", carregarEstatisticas);
+
+async function carregarEstatisticas() {
+  const eventoId = document.getElementById("filtroEventoEstat").value;
+  const container = document.getElementById("estatisticasResultado");
+  container.innerHTML = `<div style="text-align:center;padding:2rem;"><span class="spinner"></span></div>`;
+
+  let resumo, porEvento = [];
+  try {
+    if (!modoDemo) {
+      const d = await apiFetch({ action:"estatisticas", eventoId:eventoId||"", pin:pinAtual() });
+      if (d.erro) throw new Error(d.erro);
+      resumo = d.resumo;
+      porEvento = d.porEvento || [];
+    } else {
+      // Calcula demo localmente
+      await new Promise(r=>setTimeout(r,400));
+      let base = eventoId ? DEMO_INSCRITOS.filter(i=>i.eventoId===eventoId) : DEMO_INSCRITOS;
+      resumo = {
+        total: base.length,
+        presentes: base.filter(i=>i.presenca==="Presente").length,
+        ausentes: base.filter(i=>i.presenca==="Ausente").length,
+        pendentes: base.filter(i=>i.presenca==="Pendente").length,
+        confirmados: base.filter(i=>i.status==="Confirmado").length,
+        cancelados: base.filter(i=>i.status==="Cancelado").length,
+        vip: base.filter(i=>i.status==="VIP").length,
+        comBrinde: base.filter(i=>i.brinde).length,
+        comAlimento: base.filter(i=>i.alimentoKg).length,
+        comPresente: base.filter(i=>i.presenteEntregue||i.presente).length,
+        comKit: base.filter(i=>i.kit).length,
+      };
+      if (!eventoId) {
+        const evMap = {};
+        base.forEach(i => {
+          if (!evMap[i.eventoId]) evMap[i.eventoId] = { eventoId:i.eventoId, titulo:(DEMO_EVENTOS.find(e=>e.id===i.eventoId)||{}).titulo||i.eventoId, total:0,presentes:0,brinde:0,alimentoKg:0,presenteEntregue:0,kit:0 };
+          evMap[i.eventoId].total++;
+          if(i.presenca==="Presente") evMap[i.eventoId].presentes++;
+          if(i.brinde) evMap[i.eventoId].brinde++;
+          if(i.alimentoKg) evMap[i.eventoId].alimentoKg++;
+          if(i.presenteEntregue||i.presente) evMap[i.eventoId].presenteEntregue++;
+          if(i.kit) evMap[i.eventoId].kit++;
+        });
+        porEvento = Object.values(evMap);
+      }
+    }
+  } catch(e) {
+    container.innerHTML = `<div class="alert alert-error">Erro ao carregar estatísticas: ${e.message}</div>`;
+    return;
+  }
+
+  const pPres = resumo.total > 0 ? Math.round((resumo.presentes/resumo.total)*100) : 0;
+
+  container.innerHTML = `
+    <!-- KPIs principais -->
+    <div class="grid-4" style="margin-bottom:1rem;">
+      <div class="stat-card">
+        <span class="stat-label">Total de inscritos</span>
+        <span class="stat-value">${resumo.total}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">✅ Presentes</span>
+        <span class="stat-value" style="color:var(--green-700);">${resumo.presentes}</span>
+        <span class="stat-sub">${pPres}% do total</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">⏳ Pendentes</span>
+        <span class="stat-value" style="color:var(--amber-700);">${resumo.pendentes}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">❌ Ausentes</span>
+        <span class="stat-value" style="color:var(--red-700);">${resumo.ausentes}</span>
+      </div>
+    </div>
+
+    <!-- Barra de presença -->
+    <div class="card" style="margin-bottom:1rem;">
+      <div class="card-title" style="margin-bottom:.75rem;">📈 Taxa de presença</div>
+      <div style="display:flex;align-items:center;gap:.75rem;">
+        <div class="progress" style="flex:1;">
+          <div class="progress-bar" style="width:${pPres}%;background:${pPres>70?'var(--green-500)':pPres>40?'var(--amber-500)':'var(--red-500)'};"></div>
+        </div>
+        <strong style="min-width:3rem;text-align:right;">${pPres}%</strong>
+      </div>
+    </div>
+
+    <!-- Status de inscrição -->
+    <div class="grid-3" style="margin-bottom:1rem;">
+      <div class="stat-card">
+        <span class="stat-label">✅ Confirmados</span>
+        <span class="stat-value">${resumo.confirmados}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">❌ Cancelados</span>
+        <span class="stat-value">${resumo.cancelados}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">🌟 VIP</span>
+        <span class="stat-value">${resumo.vip}</span>
+      </div>
+    </div>
+
+    <!-- Itens entregues na entrada -->
+    <div class="card" style="margin-bottom:1rem;">
+      <div class="card-title">🎁 Itens entregues na entrada</div>
+      <div class="grid-4">
+        ${[
+          {label:"🎁 Brinde",val:resumo.comBrinde},
+          {label:"🌾 Kg alimento",val:resumo.comAlimento},
+          {label:"🎀 Presente",val:resumo.comPresente},
+          {label:"📦 Kit",val:resumo.comKit},
+        ].map(item => {
+          const pct = resumo.presentes > 0 ? Math.round((item.val/resumo.presentes)*100) : 0;
+          return `
+          <div class="stat-card">
+            <span class="stat-label">${item.label}</span>
+            <span class="stat-value">${item.val}</span>
+            <div class="progress" style="margin-top:.35rem;">
+              <div class="progress-bar" style="width:${pct}%;"></div>
+            </div>
+            <span class="stat-sub">${pct}% dos presentes</span>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+
+    ${porEvento.length > 0 ? `
+    <!-- Por evento -->
+    <div class="card" style="padding:0;overflow-x:auto;">
+      <div style="padding:.85rem 1rem .5rem;" class="card-title">📋 Por evento</div>
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Evento</th>
+            <th>Inscritos</th>
+            <th>Presentes</th>
+            <th>🎁 Brinde</th>
+            <th>🌾 Alimento</th>
+            <th>🎀 Presente</th>
+            <th>📦 Kit</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${porEvento.map(ev => `
+          <tr>
+            <td><strong>${ev.titulo}</strong></td>
+            <td>${ev.total}</td>
+            <td>${ev.presentes} <span style="color:var(--gray-400);font-size:.78rem;">(${ev.total>0?Math.round(ev.presentes/ev.total*100):0}%)</span></td>
+            <td>${ev.brinde}</td>
+            <td>${ev.alimentoKg}</td>
+            <td>${ev.presenteEntregue}</td>
+            <td>${ev.kit}</td>
+          </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>` : ""}
+  `;
+}
+
+// ================================================================
+//  CERTIFICADOS — link dinâmico
+// ================================================================
+document.getElementById("certEvento").addEventListener("change", function() {
+  const id = this.value;
+  const btn = document.getElementById("btnAbrirCertificado");
+  if (id) {
+    btn.href = `certificado.html?evento=${id}&tab=configurar&pin=${encodeURIComponent(pinAtual())}`;
+    btn.style.pointerEvents = "";
+    btn.style.opacity = "1";
+  } else {
+    btn.href = "#";
+    btn.style.pointerEvents = "none";
+    btn.style.opacity = ".5";
+  }
+});
+
+// ================================================================
+//  FECHAR MODAL ao clicar no overlay
+// ================================================================
+document.getElementById("modalOverlay").addEventListener("click", function(e) {
+  if (e.target === this) fecharModal();
+});
+</script>
+</body>
+</html>

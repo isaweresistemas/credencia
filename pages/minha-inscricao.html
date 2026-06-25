@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Minha Inscrição — Isawere Credencia</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@700;800&display=swap');
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',system-ui,sans-serif;background:#f8fafc;color:#1e293b;line-height:1.55;}
+    :root{
+      --blue-50:#eff6ff;--blue-600:#2563eb;--blue-700:#1d4ed8;
+      --gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-300:#cbd5e1;
+      --gray-500:#64748b;--gray-700:#334155;--gray-900:#0f172a;
+      --green-50:#f0fdf4;--green-500:#22c55e;
+      --red-50:#fef2f2;--red-500:#ef4444;
+      --amber-50:#fffbeb;--amber-500:#f59e0b;
+      --radius:12px;
+      --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+    }
+    .container{max-width:560px;margin:0 auto;padding:1.5rem 1rem 3rem;}
+    .site-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;background:#fff;border-bottom:1px solid var(--gray-100);position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+    .logo{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:800;color:var(--gray-900);text-decoration:none;display:flex;align-items:center;gap:.35rem;}
+    .logo span{color:var(--blue-600);}
+    .header-nav{display:flex;gap:.1rem;}
+    .header-nav a{font-size:.82rem;font-weight:500;color:var(--gray-500);text-decoration:none;padding:.4rem .65rem;border-radius:6px;transition:background .15s,color .15s;}
+    .header-nav a:hover,.header-nav a.active{background:var(--blue-50);color:var(--blue-600);}
+    .page-hero{background:linear-gradient(135deg,var(--blue-600),var(--blue-700));color:#fff;padding:2rem 1.25rem 2.25rem;text-align:center;}
+    .page-hero h1{font-family:'Sora',sans-serif;font-size:1.55rem;font-weight:800;margin-bottom:.4rem;}
+    .page-hero p{font-size:.93rem;opacity:.88;}
+    .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.25rem;margin-bottom:1rem;}
+    .card-title{font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;color:var(--gray-900);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+    .form-group{margin-bottom:.9rem;}
+    .form-group label{display:block;font-size:.83rem;font-weight:600;color:var(--gray-700);margin-bottom:.35rem;}
+    input,select{width:100%;padding:.6rem .75rem;font-size:.9rem;font-family:inherit;border:1.5px solid var(--gray-200);border-radius:8px;background:#fff;color:var(--gray-900);outline:none;transition:border-color .15s,box-shadow .15s;}
+    input:focus,select:focus{border-color:var(--blue-600);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.6rem 1.1rem;font-size:.88rem;font-weight:600;font-family:inherit;border-radius:8px;border:1.5px solid transparent;cursor:pointer;text-decoration:none;transition:all .15s;}
+    .btn:disabled{opacity:.55;cursor:not-allowed;}
+    .btn-primary{background:var(--blue-600);color:#fff;border-color:var(--blue-600);}
+    .btn-primary:hover:not(:disabled){background:var(--blue-700);}
+    .btn-success{background:#16a34a;color:#fff;border-color:#16a34a;}
+    .btn-success:hover:not(:disabled){background:#15803d;}
+    .btn-outline{background:#fff;color:var(--gray-700);border-color:var(--gray-200);}
+    .btn-outline:hover:not(:disabled){background:var(--gray-50);}
+    .btn-full{width:100%;}
+    .badge{display:inline-flex;align-items:center;gap:.25rem;padding:.25rem .6rem;border-radius:99px;font-size:.75rem;font-weight:600;}
+    .badge-green{background:var(--green-50);color:#15803d;}
+    .badge-red{background:var(--red-50);color:#b91c1c;}
+    .badge-amber{background:var(--amber-50);color:#92400e;}
+    .badge-blue{background:var(--blue-50);color:var(--blue-700);}
+    .alert{padding:.75rem 1rem;border-radius:8px;font-size:.88rem;margin-bottom:.75rem;border-left:4px solid;}
+    .alert-error{background:var(--red-50);color:#b91c1c;border-color:var(--red-500);}
+    .alert-warning{background:var(--amber-50);color:#92400e;border-color:var(--amber-500);}
+    .info-row{display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;padding:.55rem 0;border-bottom:1px solid var(--gray-100);}
+    .info-row:last-child{border-bottom:none;}
+    .info-row .label{font-size:.8rem;color:var(--gray-500);font-weight:500;white-space:nowrap;min-width:90px;}
+    .info-row .value{font-size:.88rem;color:var(--gray-900);text-align:right;}
+    .qr-wrapper{display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1rem;background:var(--gray-50);border-radius:10px;}
+    .divider{border:none;border-top:1px solid var(--gray-100);margin:1rem 0;}
+    .spinner{display:inline-block;width:18px;height:18px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo" href="../index.html">🎓 <span>Isawere</span> Credencia</a>
+  <nav class="header-nav">
+    <a href="../index.html">Eventos</a>
+    <a href="minha-inscricao.html" class="active">Minha Inscrição</a>
+    <a href="certificado.html">Certificado</a>
+  </nav>
+</header>
+
+<div class="page-hero">
+  <h1>Minha Inscrição</h1>
+  <p>Consulte, baixe o QR Code ou solicite reenvio por e-mail.</p>
+</div>
+
+<div class="container">
+
+  <!-- BUSCA -->
+  <div class="card" id="searchCard">
+    <div class="card-title">🔍 Consultar inscrição</div>
+
+    <div class="form-group">
+      <label>Buscar por</label>
+      <select id="tipoBusca">
+        <option value="cpf">CPF</option>
+        <option value="email">E-mail</option>
+        <option value="codigo">Código da inscrição</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label id="labelBusca">CPF</label>
+      <input id="valorBusca" type="text" placeholder="000.000.000-00" />
+    </div>
+
+    <div id="alertBox"></div>
+
+    <button class="btn btn-primary btn-full" id="btnBuscar">
+      🔍 Buscar inscrição
+    </button>
+
+    <p style="text-align:center;margin-top:1rem;font-size:.83rem;color:var(--gray-500);">
+      <strong>Modo demonstração</strong> — use CPF <code>123.456.789-09</code> ou e-mail <code>demo@isawere.com.br</code>
+    </p>
+  </div>
+
+  <!-- RESULTADO -->
+  <div id="resultado" style="display:none;"></div>
+
+</div>
+
+<script>
+// ===== CONFIG =====
+const CONFIG = { APPS_SCRIPT_URL: "https://script.google.com/macros/s/SEU_ID_AQUI/exec" };
+
+// ===== UTILS =====
+function formatCPF(v){v=v.replace(/\D/g,"");if(v.length>11)v=v.slice(0,11);return v.replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");}
+function validCPF(c){c=c.replace(/\D/g,"");if(c.length!==11||/^(\d)\1+$/.test(c))return false;let s=0;for(let i=0;i<9;i++)s+=+c[i]*(10-i);let r=s%11<2?0:11-s%11;if(r!==+c[9])return false;s=0;for(let i=0;i<10;i++)s+=+c[i]*(11-i);r=s%11<2?0:11-s%11;return r===+c[10];}
+function validEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);}
+async function appsScriptFetch(p){const u=CONFIG.APPS_SCRIPT_URL+"?"+new URLSearchParams(p);const r=await fetch(u,{redirect:"follow"});return r.json();}
+async function appsScriptPost(d){const r=await fetch(CONFIG.APPS_SCRIPT_URL,{method:"POST",redirect:"follow",body:JSON.stringify(d)});return r.json();}
+function showAlert(t,m){document.getElementById("alertBox").innerHTML=`<div class="alert alert-${t}">${m}</div>`;}
+function clearAlert(){document.getElementById("alertBox").innerHTML="";}
+function renderQR(id,text,size){const el=document.getElementById(id);if(!el)return;el.innerHTML="";new QRCode(el,{text,width:size,height:size,correctLevel:QRCode.CorrectLevel.H});}
+function qrToDataURL(id){const img=document.querySelector("#"+id+" img");if(img)return img.src;const cv=document.querySelector("#"+id+" canvas");return cv?cv.toDataURL("image/png"):null;}
+
+// ===== DEMO DATA =====
+const DEMO_INSCRICOES = [{
+  codigo:"ISW-DEMO01",nome:"Maria Silva Santos",email:"demo@isawere.com.br",
+  cpf:"123.456.789-09",telefone:"(81) 99999-0001",profissao:"Fonoaudióloga",
+  registro:"CRFa 12345",evento:"Curso de Audiometria Clínica",
+  data:"15/08/2025",horario:"08:00 – 17:00",local:"Online (Zoom)",
+  status:"Confirmado",presenca:"Pendente",dataInscricao:"01/07/2025 14:32",
+}];
+
+function findDemo(tipo, valor) {
+  const v=valor.toLowerCase().replace(/\s/g,"");
+  return DEMO_INSCRICOES.find(i=>{
+    if(tipo==="cpf")    return i.cpf.replace(/\D/g,"")=== v.replace(/\D/g,"");
+    if(tipo==="email")  return i.email.toLowerCase()===v;
+    if(tipo==="codigo") return i.codigo.toLowerCase()===v;
+    return false;
+  })||null;
+}
+
+// ===== MÁSCARA DINÂMICA =====
+const tipoBusca=document.getElementById("tipoBusca");
+const valorBusca=document.getElementById("valorBusca");
+const labelBusca=document.getElementById("labelBusca");
+const PLACEHOLDER={cpf:["CPF","000.000.000-00"],email:["E-mail","seu@email.com"],codigo:["Código","ISW-ABC123"]};
+
+tipoBusca.addEventListener("change",()=>{
+  const [lbl,ph]=PLACEHOLDER[tipoBusca.value];
+  labelBusca.textContent=lbl; valorBusca.placeholder=ph; valorBusca.value=""; clearAlert();
+});
+valorBusca.addEventListener("input",function(){if(tipoBusca.value==="cpf")this.value=formatCPF(this.value);});
+
+// ===== BUSCAR =====
+document.getElementById("btnBuscar").addEventListener("click", async () => {
+  const tipo=tipoBusca.value, valor=valorBusca.value.trim();
+  if(!valor){showAlert("error","Informe o valor para buscar.");return;}
+  if(tipo==="cpf"&&!validCPF(valor)){showAlert("error","CPF inválido.");return;}
+  if(tipo==="email"&&!validEmail(valor)){showAlert("error","E-mail inválido.");return;}
+
+  const btn=document.getElementById("btnBuscar");
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Buscando…'; clearAlert();
+
+  try {
+    let inscricao=null;
+    if(!CONFIG.APPS_SCRIPT_URL.includes("SEU_ID_AQUI")){
+      const d=await appsScriptFetch({action:"buscarInscricao",tipo,valor});
+      inscricao=d.inscricao||null;
+    } else {
+      await new Promise(r=>setTimeout(r,600));
+      inscricao=findDemo(tipo,valor);
+    }
+    if(!inscricao){showAlert("warning","Inscrição não encontrada. Verifique os dados ou <a href='../index.html'>faça sua inscrição</a>.");return;}
+    renderResult(inscricao);
+  } catch(e) {
+    showAlert("error","Erro ao consultar. Tente novamente. <small>"+e.message+"</small>");
+  } finally {
+    btn.disabled=false; btn.innerHTML="🔍 Buscar inscrição";
+  }
+});
+
+// ===== RENDER RESULT =====
+function renderResult(i) {
+  const statusBadge={
+    "Confirmado":'<span class="badge badge-green">✅ Confirmado</span>',
+    "Cancelado":'<span class="badge badge-red">❌ Cancelado</span>',
+    "Pendente":'<span class="badge badge-amber">⏳ Pendente</span>',
+    "VIP":'<span class="badge badge-blue">🌟 VIP</span>',
+  }[i.status]||i.status;
+
+  const presencaBadge={
+    "Presente":'<span class="badge badge-green">✅ Presente</span>',
+    "Ausente":'<span class="badge badge-red">❌ Ausente</span>',
+    "Pendente":'<span class="badge badge-amber">⏳ Aguardando evento</span>',
+  }[i.presenca]||i.presenca;
+
+  const certBtn=i.presenca==="Presente"
+    ?`<a class="btn btn-success" href="certificado.html?codigo=${i.codigo}">🎓 Ver / baixar certificado</a>`
+    :`<button class="btn btn-outline" disabled title="Disponível após confirmação de presença">🎓 Certificado</button>`;
+
+  document.getElementById("resultado").innerHTML=`
+    <div class="card">
+      <div class="card-title">🎫 Inscrição encontrada</div>
+      <div style="background:var(--blue-50);border-radius:8px;padding:.75rem;margin-bottom:1rem;">
+        <strong style="color:var(--blue-700);font-size:.95rem;">${i.evento}</strong><br>
+        <span style="font-size:.85rem;color:var(--gray-500);">📅 ${i.data} &nbsp; 🕐 ${i.horario} &nbsp; 📍 ${i.local}</span>
+      </div>
+      <div class="info-row"><span class="label">Participante</span><span class="value">${i.nome}</span></div>
+      <div class="info-row"><span class="label">CPF</span><span class="value">${i.cpf}</span></div>
+      <div class="info-row"><span class="label">E-mail</span><span class="value">${i.email}</span></div>
+      <div class="info-row"><span class="label">Status</span><span class="value">${statusBadge}</span></div>
+      <div class="info-row"><span class="label">Presença</span><span class="value">${presencaBadge}</span></div>
+      <div class="info-row"><span class="label">Inscrito em</span><span class="value">${i.dataInscricao}</span></div>
+      <hr class="divider" />
+      <div class="qr-wrapper" style="margin-bottom:1rem;">
+        <div id="qrResult"></div>
+        <p style="font-size:.8rem;color:var(--gray-500);">Código: <strong>${i.codigo}</strong></p>
+      </div>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+        <button class="btn btn-primary" id="btnDlQR">⬇️ Salvar QR Code</button>
+        <button class="btn btn-outline" id="btnReenviar">📧 Reenviar e-mail</button>
+        ${certBtn}
+      </div>
+    </div>`;
+
+  document.getElementById("resultado").style.display="block";
+
+  setTimeout(()=>{
+    renderQR("qrResult",i.codigo,180);
+
+    document.getElementById("btnDlQR").addEventListener("click",()=>{
+      setTimeout(()=>{
+        const url=qrToDataURL("qrResult");
+        if(!url)return;
+        const a=document.createElement("a");
+        a.href=url; a.download=`qrcode-${i.codigo}.png`; a.click();
+      },300);
+    });
+
+    document.getElementById("btnReenviar").addEventListener("click",async()=>{
+      const b=document.getElementById("btnReenviar");
+      b.disabled=true; b.innerHTML='<span class="spinner"></span>';
+      try{
+        if(!CONFIG.APPS_SCRIPT_URL.includes("SEU_ID_AQUI"))
+          await appsScriptPost({action:"reenviarEmail",codigo:i.codigo});
+        else await new Promise(r=>setTimeout(r,800));
+        b.innerHTML="✅ Enviado!";
+        setTimeout(()=>{b.innerHTML="📧 Reenviar e-mail";b.disabled=false;},3000);
+      }catch{b.innerHTML="❌ Erro";b.disabled=false;}
+    });
+  },150);
+
+  document.getElementById("resultado").scrollIntoView({behavior:"smooth"});
+}
+</script>
+</body>
+</html>

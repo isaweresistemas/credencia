@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Validar Presença — Isawere Credencia</title>
+  <!-- ===== ESTILOS BASE EMBUTIDOS ===== -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@700;800&display=swap');
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',system-ui,sans-serif;background:#f8fafc;color:#1e293b;line-height:1.55;}
+    :root{
+      --blue-50:#eff6ff;--blue-600:#2563eb;--blue-700:#1d4ed8;
+      --gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-300:#cbd5e1;
+      --gray-500:#64748b;--gray-700:#334155;--gray-900:#0f172a;
+      --green-50:#f0fdf4;--green-500:#22c55e;
+      --red-50:#fef2f2;--red-500:#ef4444;
+      --amber-50:#fffbeb;--amber-500:#f59e0b;
+      --radius:12px;--shadow:0 1px 3px rgba(0,0,0,.08);
+    }
+    .container{max-width:600px;margin:0 auto;padding:1.5rem 1rem 3rem;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+    @media(max-width:480px){.grid-2{grid-template-columns:1fr;}}
+    .site-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;background:#fff;border-bottom:1px solid var(--gray-100);position:sticky;top:0;z-index:100;box-shadow:var(--shadow);}
+    .logo{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:800;color:var(--gray-900);text-decoration:none;display:flex;align-items:center;gap:.35rem;}
+    .logo span{color:var(--blue-600);}
+    .header-nav{display:flex;gap:.1rem;}
+    .header-nav a{font-size:.82rem;font-weight:500;color:var(--gray-500);text-decoration:none;padding:.4rem .65rem;border-radius:6px;transition:background .15s,color .15s;}
+    .header-nav a:hover{background:var(--blue-50);color:var(--blue-600);}
+    .page-hero{background:linear-gradient(135deg,var(--blue-600),var(--blue-700));color:#fff;padding:2rem 1.25rem 2.25rem;text-align:center;}
+    .page-hero h1{font-family:'Sora',sans-serif;font-size:1.55rem;font-weight:800;margin-bottom:.4rem;}
+    .page-hero p{font-size:.93rem;opacity:.88;}
+    .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.25rem;margin-bottom:1rem;}
+    .card-title{font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;color:var(--gray-900);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+    .form-group{margin-bottom:.9rem;}
+    .form-group label{display:block;font-size:.83rem;font-weight:600;color:var(--gray-700);margin-bottom:.35rem;}
+    input,select{width:100%;padding:.6rem .75rem;font-size:.9rem;font-family:inherit;border:1.5px solid var(--gray-200);border-radius:8px;background:#fff;color:var(--gray-900);outline:none;transition:border-color .15s;}
+    input:focus,select:focus{border-color:var(--blue-600);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.6rem 1.1rem;font-size:.88rem;font-weight:600;font-family:inherit;border-radius:8px;border:1.5px solid transparent;cursor:pointer;text-decoration:none;transition:all .15s;}
+    .btn:disabled{opacity:.55;cursor:not-allowed;}
+    .btn-primary{background:var(--blue-600);color:#fff;border-color:var(--blue-600);}
+    .btn-primary:hover:not(:disabled){background:var(--blue-700);}
+    .btn-outline{background:#fff;color:var(--gray-700);border-color:var(--gray-200);}
+    .btn-outline:hover:not(:disabled){background:var(--gray-50);}
+    .btn-full{width:100%;}
+    .badge{display:inline-flex;align-items:center;gap:.25rem;padding:.25rem .6rem;border-radius:99px;font-size:.75rem;font-weight:600;}
+    .badge-green{background:var(--green-50);color:#15803d;}
+    .badge-blue{background:var(--blue-50);color:var(--blue-700);}
+    .alert{padding:.75rem 1rem;border-radius:8px;font-size:.88rem;margin-bottom:.75rem;border-left:4px solid;}
+    .alert-error{background:var(--red-50);color:#b91c1c;border-color:var(--red-500);}
+    .alert-warning{background:var(--amber-50);color:#92400e;border-color:var(--amber-500);}
+    .divider{border:none;border-top:1px solid var(--gray-100);margin:1rem 0;}
+    .spinner{display:inline-block;width:18px;height:18px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    .scan-area {
+      background: var(--gray-900);
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+      min-height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .scan-area video { width: 100%; border-radius: var(--radius); display: block; }
+    .scan-line {
+      position: absolute;
+      left: 10%; right: 10%;
+      height: 2px;
+      background: var(--blue-600);
+      box-shadow: 0 0 8px var(--blue-600);
+      animation: scanMove 2s ease-in-out infinite;
+    }
+    @keyframes scanMove {
+      0%, 100% { top: 20%; }
+      50%       { top: 80%; }
+    }
+    .result-ok  { border-left: 4px solid var(--green-500); }
+    .result-err { border-left: 4px solid var(--red-500); }
+
+    #manualInput { display: flex; gap: .5rem; }
+    #manualInput input { flex: 1; }
+
+    .vip-card { border-left: 4px solid var(--blue-600); }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo" href="../index.html">🎓 <span>Isawere</span> Credencia</a>
+  <nav class="header-nav">
+    <a href="../index.html">Eventos</a>
+    <a href="admin.html">Painel</a>
+    <a href="offline.html">📡 Modo Offline</a>
+  </nav>
+</header>
+
+<div class="page-hero">
+  <h1>Validar Presença</h1>
+  <p>Escaneie o QR Code do participante, digite o código ou crie uma credencial VIP.</p>
+</div>
+
+<div class="container">
+
+  <div id="alertBox"></div>
+
+  <!-- Scan camera -->
+  <div class="card">
+    <div class="card-title">📷 Câmera (Scanner)</div>
+
+    <div class="scan-area" id="scanArea">
+      <video id="video" playsinline></video>
+      <div class="scan-line" id="scanLine"></div>
+      <div id="cameraOff" style="color:var(--gray-300);font-size:.9rem;padding:2rem;text-align:center;">
+        <p style="font-size:2rem;margin-bottom:.5rem;">📷</p>
+        Câmera desativada.<br>Clique em "Ativar câmera" para escanear.
+      </div>
+    </div>
+
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="btnCamera">📷 Ativar câmera</button>
+      <button class="btn btn-outline" id="btnParar" style="display:none;">⏹️ Parar</button>
+    </div>
+  </div>
+
+  <!-- Manual input -->
+  <div class="card">
+    <div class="card-title">⌨️ Inserir código manualmente</div>
+    <div id="manualInput">
+      <input type="text" id="codigoManual" placeholder="ISW-XXXXXX" style="text-transform:uppercase;" />
+      <button class="btn btn-primary" id="btnValidar">Validar</button>
+    </div>
+  </div>
+
+  <!-- ===================== CREDENCIAL VIP ===================== -->
+  <div class="card">
+    <div class="card-title">🌟 Criar credencial VIP</div>
+    <p style="font-size:.85rem;color:var(--gray-500);margin-bottom:1rem;">
+      Use para autoridades e convidados que chegam no dia sem inscrição prévia.
+      A presença já é registrada automaticamente como <strong>Presente</strong>.
+    </p>
+
+    <div class="form-group">
+      <label>Evento *</label>
+      <select id="vipEvento"></select>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Nome completo *</label>
+        <input id="vipNome" type="text" placeholder="Nome do convidado" />
+      </div>
+      <div class="form-group">
+        <label>Cargo / instituição</label>
+        <input id="vipCargo" type="text" placeholder="Ex.: Secretário de Saúde" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>PIN de operador *</label>
+      <input id="vipPin" type="password" placeholder="PIN" autocomplete="off" />
+    </div>
+
+    <button class="btn btn-primary btn-full" id="btnCriarVIP">🌟 Gerar credencial VIP</button>
+
+    <div id="resultadoVip" style="display:none;margin-top:1rem;"></div>
+  </div>
+
+  <!-- Resultado da validação por QR/código -->
+  <div id="resultado" style="display:none;"></div>
+
+  <!-- Contadores -->
+  <div class="card">
+    <div class="card-title">📊 Resumo do dia</div>
+    <div class="grid-2">
+      <div style="text-align:center;padding:.75rem;background:var(--green-50);border-radius:8px;">
+        <div style="font-family:'Sora',sans-serif;font-size:2rem;font-weight:800;color:var(--green-500);" id="cntPresente">0</div>
+        <div style="font-size:.82rem;color:var(--gray-500);">Presentes</div>
+      </div>
+      <div style="text-align:center;padding:.75rem;background:var(--red-50);border-radius:8px;">
+        <div style="font-family:'Sora',sans-serif;font-size:2rem;font-weight:800;color:var(--red-500);" id="cntErro">0</div>
+        <div style="font-size:.82rem;color:var(--gray-500);">Não encontrados</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- jsQR para leitura de QR Code via câmera -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script>
+const CONFIG = { APPS_SCRIPT_URL: "https://script.google.com/macros/s/SEU_ID_AQUI/exec" };
+async function appsScriptFetch(p){const u=CONFIG.APPS_SCRIPT_URL+"?"+new URLSearchParams(p);const r=await fetch(u,{redirect:"follow"});return r.json();}
+async function appsScriptPost(d){const r=await fetch(CONFIG.APPS_SCRIPT_URL,{method:"POST",redirect:"follow",body:JSON.stringify(d)});return r.json();}
+function showAlert(t,m,id="alertBox"){const el=document.getElementById(id);if(el)el.innerHTML=`<div class="alert alert-${t}">${m}</div>`;}
+function clearAlert(id="alertBox"){const el=document.getElementById(id);if(el)el.innerHTML="";}
+function renderQR(id,text,size){const el=document.getElementById(id);if(!el)return;el.innerHTML="";new QRCode(el,{text,width:size,height:size,correctLevel:QRCode.CorrectLevel.H});}
+</script>
+<script>
+let cntOk = 0, cntErr = 0;
+let scanning = false;
+let stream = null;
+
+// ------- DADOS DEMO -------
+const DEMO = {
+  "ISW-DEMO01": { nome: "Maria Silva Santos", evento: "Curso de Audiometria Clínica", status: "Confirmado" },
+  "ISW-DEMO02": { nome: "João Pereira Costa",  evento: "Curso de Audiometria Clínica", status: "Confirmado" },
+};
+
+const DEMO_EVENTOS_VIP = [
+  { id: "ev001", titulo: "Curso de Audiometria Clínica" },
+  { id: "ev002", titulo: "Workshop: Reabilitação Auditiva" },
+  { id: "ev003", titulo: "Jornada de Fonoaudiologia 2025" },
+];
+
+// ------- VALIDAÇÃO -------
+async function validarCodigo(codigo) {
+  codigo = codigo.trim().toUpperCase();
+  if (!codigo) return;
+
+  const res = document.getElementById("resultado");
+
+  try {
+    let insc = null;
+    if (!CONFIG.APPS_SCRIPT_URL.includes("SEU_ID_AQUI")) {
+      const d = await appsScriptPost({ action: "registrarPresenca", codigo });
+      insc = d.inscricao;
+    } else {
+      await new Promise(r => setTimeout(r, 400));
+      insc = DEMO[codigo] ? { ...DEMO[codigo], codigo, presenca: "Presente" } : null;
+    }
+
+    if (insc) {
+      cntOk++;
+      document.getElementById("cntPresente").textContent = cntOk;
+      res.innerHTML = `
+        <div class="card result-ok">
+          <div style="font-size:3rem;text-align:center;margin-bottom:.5rem;">✅</div>
+          <div class="info-row"><span class="label">Participante</span><span class="value">${insc.nome}</span></div>
+          <div class="info-row"><span class="label">Evento</span><span class="value">${insc.evento}</span></div>
+          <div class="info-row"><span class="label">Código</span><span class="value">${insc.codigo}</span></div>
+          <div class="info-row"><span class="label">Presença</span><span class="value"><span class="badge badge-green">✅ Registrada</span></span></div>
+          ${itensCheckinHTML(insc.codigo, insc)}
+        </div>`;
+    } else {
+      cntErr++;
+      document.getElementById("cntErro").textContent = cntErr;
+      res.innerHTML = `
+        <div class="card result-err">
+          <div style="font-size:3rem;text-align:center;margin-bottom:.5rem;">❌</div>
+          <div class="alert alert-error">Código <strong>${codigo}</strong> não encontrado ou já utilizado.</div>
+        </div>`;
+    }
+  } catch (e) {
+    res.innerHTML = `<div class="card"><div class="alert alert-error">Erro ao validar: ${e.message}</div></div>`;
+  }
+
+  res.style.display = "block";
+  res.scrollIntoView({ behavior: "smooth" });
+}
+
+// ------- MANUAL -------
+document.getElementById("btnValidar").addEventListener("click", () => {
+  const v = document.getElementById("codigoManual").value;
+  validarCodigo(v);
+  document.getElementById("codigoManual").value = "";
+});
+
+document.getElementById("codigoManual").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("btnValidar").click();
+});
+
+// ------- ITENS ENTREGUES (Brinde / Kg de alimento / Presente / Kit) -------
+function itensCheckinHTML(codigo, vals) {
+  vals = vals || {};
+  const boxId = "itens-" + codigo.replace(/[^A-Z0-9]/gi, "");
+  return `
+    <hr class="divider" />
+    <p style="font-size:.85rem;font-weight:600;color:var(--gray-700);margin-bottom:.5rem;">🎁 Itens entregues</p>
+    <div id="${boxId}" style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.75rem;">
+      <label style="display:flex;align-items:center;gap:.4rem;font-weight:500;">
+        <input type="checkbox" class="chk-brinde" ${vals.brinde ? "checked" : ""}/> Brinde
+      </label>
+      <label style="display:flex;align-items:center;gap:.4rem;font-weight:500;">
+        <input type="checkbox" class="chk-alimento" ${vals.alimentoKg ? "checked" : ""}/> Kg de alimento
+      </label>
+      <label style="display:flex;align-items:center;gap:.4rem;font-weight:500;">
+        <input type="checkbox" class="chk-presente" ${vals.presenteEntregue ? "checked" : ""}/> Presente
+      </label>
+      <label style="display:flex;align-items:center;gap:.4rem;font-weight:500;">
+        <input type="checkbox" class="chk-kit" ${vals.kit ? "checked" : ""}/> Kit
+      </label>
+    </div>
+    <button class="btn btn-outline btn-full" onclick="salvarItens('${codigo}','${boxId}', this)">💾 Salvar itens</button>
+    <div class="itens-status" style="font-size:.78rem;color:var(--gray-500);margin-top:.4rem;"></div>`;
+}
+
+async function salvarItens(codigo, boxId, btnEl) {
+  const box = document.getElementById(boxId);
+  const brinde           = box.querySelector(".chk-brinde").checked;
+  const alimentoKg       = box.querySelector(".chk-alimento").checked;
+  const presenteEntregue = box.querySelector(".chk-presente").checked;
+  const kit              = box.querySelector(".chk-kit").checked;
+  const statusEl = btnEl.nextElementSibling;
+
+  btnEl.disabled = true;
+  const original = btnEl.innerHTML;
+  btnEl.innerHTML = '<span class="spinner"></span>';
+
+  try {
+    if (!CONFIG.APPS_SCRIPT_URL.includes("SEU_ID_AQUI")) {
+      const d = await appsScriptPost({ action: "registrarItens", codigo, brinde, alimentoKg, presenteEntregue, kit });
+      if (d.erro) throw new Error(d.erro);
+    } else {
+      await new Promise(r => setTimeout(r, 400));
+    }
+    statusEl.textContent = "✅ Itens salvos.";
+  } catch (e) {
+    statusEl.textContent = "❌ Erro: " + e.message;
+  } finally {
+    btnEl.disabled = false;
+    btnEl.innerHTML = original;
+  }
+}
+
+// ------- CÂMERA -------
+const video = document.getElementById("video");
+const canvas = document.createElement("canvas");
+const ctx = canvas.getContext("2d");
+
+async function startCamera() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+    video.srcObject = stream;
+    video.style.display = "block";
+    document.getElementById("cameraOff").style.display = "none";
+    document.getElementById("scanLine").style.display = "block";
+    document.getElementById("btnCamera").style.display = "none";
+    document.getElementById("btnParar").style.display = "inline-flex";
+    scanning = true;
+    requestAnimationFrame(scanFrame);
+  } catch (e) {
+    showAlert("error", "Não foi possível acessar a câmera. Verifique as permissões.");
+  }
+}
+
+function stopCamera() {
+  scanning = false;
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  video.style.display = "none";
+  document.getElementById("cameraOff").style.display = "block";
+  document.getElementById("scanLine").style.display = "none";
+  document.getElementById("btnCamera").style.display = "inline-flex";
+  document.getElementById("btnParar").style.display = "none";
+}
+
+let lastCode = "";
+let lastTime = 0;
+
+function scanFrame() {
+  if (!scanning) return;
+  if (video.readyState === video.HAVE_ENOUGH_DATA) {
+    canvas.width  = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+    const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(img.data, img.width, img.height, { inversionAttempts: "dontInvert" });
+    if (code && code.data) {
+      const now = Date.now();
+      if (code.data !== lastCode || now - lastTime > 3000) {
+        lastCode = code.data;
+        lastTime = now;
+        validarCodigo(code.data);
+      }
+    }
+  }
+  requestAnimationFrame(scanFrame);
+}
+
+document.getElementById("btnCamera").addEventListener("click", startCamera);
+document.getElementById("btnParar").addEventListener("click", stopCamera);
+
+// ====================================================================
+//  CREDENCIAL VIP
+// ====================================================================
+async function carregarEventosVip() {
+  const select = document.getElementById("vipEvento");
+  let eventos = [];
+  try {
+    if (!CONFIG.APPS_SCRIPT_URL.includes("SEU_ID_AQUI")) {
+      const d = await appsScriptFetch({ action: "listarEventos" });
+      eventos = d.eventos || [];
+    } else {
+      eventos = DEMO_EVENTOS_VIP;
+    }
+  } catch {
+    eventos = DEMO_EVENTOS_VIP;
+  }
+  select.innerHTML = eventos.map(e => `<option value="${e.id}">${e.titulo}</option>`).join("");
+}
+carregarEventosVip();
+
+// Lembra o PIN no navegador durante a sessão, para não digitar a cada credencial
+const pinSalvo = sessionStorage.getItem("isawere_pin");
+if (pinSalvo) document.getElementById("vipPin").value = pinSalvo;
+
+document.getElementById("btnCriarVIP").addEventListener("click", async () => {
+  const eventoId = document.getElementById("vipEvento").value;
+  const nome     = document.getElementById("vipNome").value.trim();
+  const cargo    = document.getElementById("vipCargo").value.trim();
+  const pin      = document.getElementById("vipPin").value.trim();
+
+  if (!nome)     { showAlert("error", "Informe o nome do convidado."); return; }
+  if (!eventoId) { showAlert("error", "Selecione o evento."); return; }
+  if (!pin)      { showAlert("error", "Informe o PIN de operador."); return; }
+
+  const btn = document.getElementById("btnCriarVIP");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Gerando…';
+  clearAlert();
+
+  try {
+    let codigo;
+    if (!CONFIG.APPS_SCRIPT_URL.includes("SEU_ID_AQUI")) {
+      const d = await appsScriptPost({ action: "criarVIP", eventoId, nome, cargo, pin });
+      if (d.erro) throw new Error(d.erro);
+      codigo = d.codigo;
+    } else {
+      await new Promise(r => setTimeout(r, 500));
+      codigo = "VIP-" + Date.now().toString(36).toUpperCase();
+    }
+
+    sessionStorage.setItem("isawere_pin", pin);
+    cntOk++;
+    document.getElementById("cntPresente").textContent = cntOk;
+
+    const evTitulo = document.getElementById("vipEvento").selectedOptions[0]?.textContent || "";
+    const res = document.getElementById("resultadoVip");
+    res.innerHTML = `
+      <div class="card vip-card" style="text-align:center;">
+        <div style="font-size:2rem;">🌟</div>
+        <div class="info-row"><span class="label">Convidado</span><span class="value">${nome}</span></div>
+        ${cargo ? `<div class="info-row"><span class="label">Cargo</span><span class="value">${cargo}</span></div>` : ""}
+        <div class="info-row"><span class="label">Evento</span><span class="value">${evTitulo}</span></div>
+        <div class="info-row"><span class="label">Presença</span><span class="value"><span class="badge badge-green">✅ Registrada</span></span></div>
+        <div class="qr-wrapper" style="margin-top:1rem;">
+          <div id="qrVip"></div>
+          <p style="font-size:.8rem;color:var(--gray-500);">Código: <strong>${codigo}</strong></p>
+        </div>
+        ${itensCheckinHTML(codigo, {})}
+        <button class="btn btn-outline" onclick="window.print()" style="margin-top:.75rem;">🖨️ Imprimir credencial</button>
+      </div>`;
+    res.style.display = "block";
+    setTimeout(() => renderQR("qrVip", codigo, 160), 100);
+
+    document.getElementById("vipNome").value = "";
+    document.getElementById("vipCargo").value = "";
+
+  } catch (e) {
+    showAlert("error", "Erro ao gerar credencial VIP: " + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = "🌟 Gerar credencial VIP";
+  }
+});
+</script>
+</body>
+</html>

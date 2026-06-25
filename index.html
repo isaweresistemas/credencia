@@ -1,1 +1,165 @@
-teste
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Eventos — Isawere Credencia</title>
+
+  <!-- ===== ESTILOS E UTILITÁRIOS EMBUTIDOS ===== -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@700;800&display=swap');
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',system-ui,sans-serif;background:#f8fafc;color:#1e293b;line-height:1.55;}
+    :root{
+      --blue-50:#eff6ff;--blue-100:#dbeafe;--blue-600:#2563eb;--blue-700:#1d4ed8;
+      --gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-300:#cbd5e1;
+      --gray-400:#94a3b8;--gray-500:#64748b;--gray-700:#334155;--gray-900:#0f172a;
+      --green-50:#f0fdf4;--green-500:#22c55e;
+      --amber-50:#fffbeb;--amber-500:#f59e0b;
+      --red-50:#fef2f2;--red-500:#ef4444;
+      --white:#fff;--radius:12px;
+      --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+      --shadow-lg:0 10px 25px rgba(0,0,0,.12);
+    }
+    .container-wide{max-width:960px;margin:0 auto;padding:1.5rem 1rem 3rem;}
+    .site-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;background:#fff;border-bottom:1px solid var(--gray-100);position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+    .logo{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:800;color:var(--gray-900);text-decoration:none;display:flex;align-items:center;gap:.35rem;}
+    .logo span{color:var(--blue-600);}
+    .header-nav{display:flex;gap:.1rem;}
+    .header-nav a{font-size:.82rem;font-weight:500;color:var(--gray-500);text-decoration:none;padding:.4rem .65rem;border-radius:6px;transition:background .15s,color .15s;}
+    .header-nav a:hover,.header-nav a.active{background:var(--blue-50);color:var(--blue-600);}
+    .page-hero{background:linear-gradient(135deg,var(--blue-600),var(--blue-700));color:#fff;padding:2rem 1.25rem 2.25rem;text-align:center;}
+    .page-hero h1{font-family:'Sora',sans-serif;font-size:1.55rem;font-weight:800;margin-bottom:.4rem;}
+    .page-hero p{font-size:.93rem;opacity:.88;}
+    .badge{display:inline-flex;align-items:center;gap:.25rem;padding:.25rem .6rem;border-radius:99px;font-size:.75rem;font-weight:600;}
+    .badge-green{background:var(--green-50);color:#15803d;}
+    .badge-amber{background:var(--amber-50);color:#92400e;}
+    .badge-red{background:var(--red-50);color:#b91c1c;}
+    .badge-blue{background:var(--blue-50);color:var(--blue-700);}
+    .divider{border:none;border-top:1px solid var(--gray-100);margin:1rem 0;}
+    .section-title{font-family:'Sora',sans-serif;font-weight:800;font-size:1.05rem;color:var(--gray-900);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+    .spinner{display:inline-block;width:24px;height:24px;border:2px solid var(--blue-600);border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* Event grid */
+    .event-card{background:#fff;border-radius:var(--radius);box-shadow:0 1px 3px rgba(0,0,0,.08);overflow:hidden;transition:box-shadow .15s,transform .15s;text-decoration:none;color:inherit;display:block;}
+    .event-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px);}
+    .event-card-body{padding:1.25rem;}
+    .event-card-header{background:linear-gradient(135deg,var(--blue-600),var(--blue-700));height:6px;}
+    .event-card h2{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:700;color:var(--gray-900);margin-bottom:.5rem;}
+    .event-card .meta{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.75rem;}
+    .event-card .meta span{font-size:.8rem;color:var(--gray-500);display:flex;align-items:center;gap:.25rem;}
+    .event-card p{font-size:.88rem;color:var(--gray-500);margin-bottom:1rem;line-height:1.5;}
+    .events-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;}
+    #loadingState,#emptyState{text-align:center;padding:3rem 1rem;color:var(--gray-500);}
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo" href="index.html">🎓 <span>Isawere</span> Credencia</a>
+  <nav class="header-nav">
+    <a href="index.html" class="active">Eventos</a>
+    <a href="pages/minha-inscricao.html">Minha Inscrição</a>
+    <a href="pages/certificado.html">Certificado</a>
+  </nav>
+</header>
+
+<div class="page-hero">
+  <h1>Cursos &amp; Eventos</h1>
+  <p>Escolha um evento abaixo e faça sua inscrição em segundos.</p>
+</div>
+
+<div class="container-wide">
+  <p class="section-title">📅 Próximos eventos</p>
+
+  <div id="loadingState">
+    <div class="spinner" style="margin:0 auto 1rem;"></div>
+    Carregando eventos…
+  </div>
+
+  <div id="emptyState" style="display:none;">
+    <p style="font-size:2rem;margin-bottom:.5rem;">📭</p>
+    <p>Nenhum evento disponível no momento.<br>Volte em breve!</p>
+  </div>
+
+  <div class="events-grid" id="eventsGrid" style="display:none;"></div>
+
+  <hr class="divider" style="margin-top:2rem;">
+  <p style="text-align:center;font-size:.85rem;color:var(--gray-500);">
+    Já se inscreveu? <a href="pages/minha-inscricao.html" style="color:var(--blue-600);font-weight:600;">Consulte sua inscrição →</a>
+  </p>
+</div>
+
+<script>
+// ===== CONFIG =====
+const CONFIG = {
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/SEU_ID_AQUI/exec",
+};
+
+async function appsScriptFetch(params){
+  const url=CONFIG.APPS_SCRIPT_URL+"?"+new URLSearchParams(params);
+  const r=await fetch(url,{redirect:"follow"});
+  if(!r.ok)throw new Error("HTTP "+r.status);
+  return r.json();
+}
+
+const DEMO_EVENTS = [
+  {id:"ev001",titulo:"Curso de Audiometria Clínica",data:"15/08/2025",horario:"08:00 – 17:00",local:"Online (Zoom)",vagas:40,inscritos:18,descricao:"Capacitação prática em audiometria tonal e vocal para fonoaudiólogos e otorrinolaringologistas.",certificado:true},
+  {id:"ev002",titulo:"Workshop: Reabilitação Auditiva",data:"22/08/2025",horario:"13:00 – 18:00",local:"São Paulo – SP",vagas:25,inscritos:10,descricao:"Abordagem clínica moderna para reabilitação de pacientes com perda auditiva.",certificado:true},
+  {id:"ev003",titulo:"Jornada de Fonoaudiologia 2025",data:"05/09/2025",horario:"08:00 – 18:00",local:"Recife – PE",vagas:100,inscritos:47,descricao:"Congresso com palestras, mesas-redondas e oficinas nas áreas de voz, linguagem e audição.",certificado:true},
+];
+
+function buildEventCard(ev){
+  const livre=ev.vagas-ev.inscritos;
+  const pct=Math.round((ev.inscritos/ev.vagas)*100);
+  const badge=livre>5
+    ?`<span class="badge badge-green">✅ ${livre} vagas</span>`
+    :livre>0
+      ?`<span class="badge badge-amber">⚠️ Últimas ${livre} vagas</span>`
+      :`<span class="badge badge-red">❌ Encerrado</span>`;
+  return `
+    <a class="event-card" href="pages/inscricao.html?evento=${ev.id}">
+      <div class="event-card-header"></div>
+      <div class="event-card-body">
+        <h2>${ev.titulo}</h2>
+        <div class="meta">
+          <span>📅 ${ev.data}</span>
+          <span>🕐 ${ev.horario}</span>
+          <span>📍 ${ev.local}</span>
+        </div>
+        <p>${ev.descricao}</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;">
+          ${badge}
+          <span class="badge badge-blue">✍️ INSCREVER</span>
+        </div>
+        <div style="margin-top:.75rem;background:#f1f5f9;border-radius:99px;height:6px;">
+          <div style="width:${pct}%;background:var(--blue-600);border-radius:99px;height:6px;transition:width .4s;"></div>
+        </div>
+        <div style="text-align:right;font-size:.75rem;color:var(--gray-500);margin-top:.25rem;">${pct}% das vagas preenchidas</div>
+      </div>
+    </a>`;
+}
+
+async function loadEvents(){
+  const grid=document.getElementById("eventsGrid");
+  const loading=document.getElementById("loadingState");
+  const empty=document.getElementById("emptyState");
+  try{
+    if(CONFIG.APPS_SCRIPT_URL.includes("SEU_ID_AQUI"))throw new Error("demo");
+    const data=await appsScriptFetch({action:"listarEventos"});
+    const events=data.eventos||[];
+    loading.style.display="none";
+    if(!events.length){empty.style.display="block";return;}
+    grid.innerHTML=events.map(buildEventCard).join("");
+    grid.style.display="grid";
+  }catch{
+    loading.style.display="none";
+    grid.innerHTML=DEMO_EVENTS.map(buildEventCard).join("");
+    grid.style.display="grid";
+  }
+}
+loadEvents();
+</script>
+</body>
+</html>

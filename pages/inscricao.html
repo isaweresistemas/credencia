@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inscrição — Isawere Credencia</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <!-- ===== ESTILOS EMBUTIDOS ===== -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@700;800&display=swap');
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',system-ui,sans-serif;background:#f8fafc;color:#1e293b;line-height:1.55;}
+    :root{
+      --blue-50:#eff6ff;--blue-600:#2563eb;--blue-700:#1d4ed8;
+      --gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;
+      --gray-400:#94a3b8;--gray-500:#64748b;--gray-700:#334155;--gray-900:#0f172a;
+      --green-50:#f0fdf4;--green-500:#22c55e;
+      --red-50:#fef2f2;--red-500:#ef4444;
+      --amber-50:#fffbeb;
+      --radius:12px;
+      --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+      --shadow-lg:0 10px 25px rgba(0,0,0,.12);
+    }
+    .container{max-width:560px;margin:0 auto;padding:1.5rem 1rem 3rem;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+    @media(max-width:480px){.grid-2{grid-template-columns:1fr;}}
+
+    /* Header */
+    .site-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;background:#fff;border-bottom:1px solid var(--gray-100);position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+    .logo{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:800;color:var(--gray-900);text-decoration:none;display:flex;align-items:center;gap:.35rem;}
+    .logo span{color:var(--blue-600);}
+    .header-nav{display:flex;gap:.1rem;}
+    .header-nav a{font-size:.82rem;font-weight:500;color:var(--gray-500);text-decoration:none;padding:.4rem .65rem;border-radius:6px;transition:background .15s,color .15s;}
+    .header-nav a:hover,.header-nav a.active{background:var(--blue-50);color:var(--blue-600);}
+
+    /* Hero */
+    .page-hero{background:linear-gradient(135deg,var(--blue-600),var(--blue-700));color:#fff;padding:2rem 1.25rem 2.25rem;text-align:center;}
+    .page-hero h1{font-family:'Sora',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:.4rem;}
+    .page-hero p{font-size:.88rem;opacity:.88;}
+
+    /* Card */
+    .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.25rem;margin-bottom:1rem;}
+    .card-title{font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;color:var(--gray-900);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+
+    /* Form */
+    .form-group{margin-bottom:.9rem;}
+    .form-group label{display:block;font-size:.83rem;font-weight:600;color:var(--gray-700);margin-bottom:.35rem;}
+    input,select,textarea{width:100%;padding:.6rem .75rem;font-size:.9rem;font-family:inherit;border:1.5px solid var(--gray-200);border-radius:8px;background:#fff;color:var(--gray-900);outline:none;transition:border-color .15s,box-shadow .15s;}
+    input:focus,select:focus,textarea:focus{border-color:var(--blue-600);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
+
+    /* Buttons */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.6rem 1.1rem;font-size:.88rem;font-weight:600;font-family:inherit;border-radius:8px;border:1.5px solid transparent;cursor:pointer;text-decoration:none;transition:all .15s;}
+    .btn:disabled{opacity:.55;cursor:not-allowed;}
+    .btn-primary{background:var(--blue-600);color:#fff;border-color:var(--blue-600);}
+    .btn-primary:hover:not(:disabled){background:var(--blue-700);}
+    .btn-success{background:#16a34a;color:#fff;border-color:#16a34a;}
+    .btn-success:hover:not(:disabled){background:#15803d;}
+    .btn-outline{background:#fff;color:var(--gray-700);border-color:var(--gray-200);}
+    .btn-outline:hover:not(:disabled){background:var(--gray-50);border-color:var(--gray-300);}
+    .btn-full{width:100%;}
+
+    /* Badges */
+    .badge{display:inline-flex;align-items:center;gap:.25rem;padding:.25rem .6rem;border-radius:99px;font-size:.75rem;font-weight:600;}
+    .badge-green{background:var(--green-50);color:#15803d;}
+    .badge-blue{background:var(--blue-50);color:var(--blue-700);}
+
+    /* Alerts */
+    .alert{padding:.75rem 1rem;border-radius:8px;font-size:.88rem;margin-bottom:.75rem;border-left:4px solid;}
+    .alert-error{background:var(--red-50);color:#b91c1c;border-color:var(--red-500);}
+
+    /* Info rows */
+    .info-row{display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;padding:.55rem 0;border-bottom:1px solid var(--gray-100);}
+    .info-row:last-child{border-bottom:none;}
+    .info-row .label{font-size:.8rem;color:var(--gray-500);font-weight:500;white-space:nowrap;min-width:90px;}
+    .info-row .value{font-size:.88rem;color:var(--gray-900);text-align:right;}
+
+    /* QR */
+    .qr-wrapper{display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1rem;background:var(--gray-50);border-radius:10px;}
+
+    /* Divider */
+    .divider{border:none;border-top:1px solid var(--gray-100);margin:1rem 0;}
+
+    /* Spinner */
+    .spinner{display:inline-block;width:18px;height:18px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* ===== STEPS — design melhorado ===== */
+    .steps-wrapper{
+      background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);
+      padding:1.1rem 1.25rem;margin-bottom:1.25rem;
+    }
+    .steps-header{
+      display:flex;align-items:center;justify-content:space-between;
+      position:relative;
+    }
+    /* Linha de fundo */
+    .steps-header::before{
+      content:'';position:absolute;top:18px;left:18px;right:18px;height:2px;
+      background:var(--gray-200);z-index:0;
+    }
+    /* Linha de progresso (atualizada via JS) */
+    .steps-progress-line{
+      position:absolute;top:18px;left:18px;height:2px;
+      background:var(--blue-600);z-index:1;
+      transition:width .4s ease;
+      width:0%;
+    }
+    .step{
+      display:flex;flex-direction:column;align-items:center;gap:.3rem;
+      position:relative;z-index:2;flex:1;
+    }
+    .step-num{
+      width:36px;height:36px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-weight:700;font-size:.88rem;
+      background:var(--gray-200);color:var(--gray-500);
+      border:2.5px solid var(--gray-200);
+      transition:all .3s;
+    }
+    .step.active .step-num{
+      background:var(--blue-600);color:#fff;border-color:var(--blue-600);
+      box-shadow:0 0 0 4px rgba(37,99,235,.2);
+    }
+    .step.done .step-num{
+      background:var(--blue-600);color:#fff;border-color:var(--blue-600);
+      content:'✓';
+    }
+    .step-label{font-size:.72rem;font-weight:600;color:var(--gray-400);text-align:center;margin-top:.2rem;}
+    .step.active .step-label{color:var(--blue-600);}
+    .step.done .step-label{color:var(--blue-600);}
+
+    /* Step info bar */
+    .step-info{
+      margin-top:.85rem;padding:.6rem .9rem;
+      background:var(--blue-50);border-radius:8px;
+      font-size:.8rem;color:var(--blue-700);font-weight:600;
+      display:flex;align-items:center;gap:.5rem;
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo" href="../index.html">🎓 <span>Isawere</span> Credencia</a>
+  <nav class="header-nav">
+    <a href="../index.html">Eventos</a>
+    <a href="minha-inscricao.html">Minha Inscrição</a>
+    <a href="certificado.html">Certificado</a>
+  </nav>
+</header>
+
+<!-- Carregando evento -->
+<div id="pageLoading" style="text-align:center;padding:4rem 1rem;">
+  <div style="display:inline-block;width:36px;height:36px;border:3px solid var(--blue-600);border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;margin-bottom:1rem;"></div>
+  <p style="color:var(--gray-500);">Carregando evento…</p>
+</div>
+
+<!-- Conteúdo principal -->
+<div id="pageContent" style="display:none;">
+  <div class="page-hero">
+    <h1 id="heroTitle">Inscrição</h1>
+    <p id="heroSub"></p>
+  </div>
+
+  <div class="container">
+
+    <!-- ===== BARRA DE PROGRESSO ===== -->
+    <div class="steps-wrapper">
+      <div class="steps-header" id="stepsHeader">
+        <!-- Linha de progresso animada -->
+        <div class="steps-progress-line" id="progressLine"></div>
+
+        <div class="step active" id="s1">
+          <div class="step-num" id="sn1">1</div>
+          <div class="step-label">Seus dados</div>
+        </div>
+        <div class="step" id="s2">
+          <div class="step-num" id="sn2">2</div>
+          <div class="step-label">Confirmar</div>
+        </div>
+        <div class="step" id="s3">
+          <div class="step-num" id="sn3">3</div>
+          <div class="step-label">QR Code</div>
+        </div>
+      </div>
+      <!-- Descrição da etapa atual -->
+      <div class="step-info" id="stepInfo">
+        <span>📝</span> <span id="stepInfoText">Preencha seus dados para continuar</span>
+      </div>
+    </div>
+
+    <div id="alertBox"></div>
+
+    <!-- ===== PASSO 1: FORMULÁRIO ===== -->
+    <div id="step1">
+      <div class="card">
+        <div class="card-title">👤 Dados do participante</div>
+
+        <div class="form-group">
+          <label>Nome completo *</label>
+          <input id="nome" type="text" placeholder="Seu nome completo" autocomplete="name" />
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>CPF *</label>
+            <input id="cpf" type="text" placeholder="000.000.000-00" maxlength="14" />
+          </div>
+          <div class="form-group">
+            <label>Telefone *</label>
+            <input id="telefone" type="text" placeholder="(00) 00000-0000" maxlength="15" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>E-mail *</label>
+          <input id="email" type="email" placeholder="seu@email.com" autocomplete="email" />
+        </div>
+
+        <div class="form-group">
+          <label>Profissão / Formação</label>
+          <input id="profissao" type="text" placeholder="Ex.: Fonoaudióloga, Estudante…" />
+        </div>
+
+        <div class="form-group">
+          <label>CRFa / CRM / Registro profissional</label>
+          <input id="registro" type="text" placeholder="Opcional" />
+        </div>
+
+        <button class="btn btn-primary btn-full" id="btnStep1">
+          Continuar →
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== PASSO 2: RESUMO ===== -->
+    <div id="step2" style="display:none;">
+      <div class="card">
+        <div class="card-title">📋 Confirme seus dados</div>
+
+        <div id="resumoEvento" style="margin-bottom:1rem;padding:.75rem;background:var(--blue-50);border-radius:8px;font-size:.9rem;color:var(--blue-700);"></div>
+
+        <div id="resumoDados"></div>
+
+        <hr class="divider" />
+
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+          <button class="btn btn-outline" onclick="goStep(1)" style="flex:1;">← Voltar</button>
+          <button class="btn btn-success btn-full" id="btnConfirmar" style="flex:2;">
+            ✅ Confirmar inscrição
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PASSO 3: QR CODE ===== -->
+    <div id="step3" style="display:none;">
+      <div class="card" style="text-align:center;">
+        <div class="card-title" style="justify-content:center;">🎉 Inscrição confirmada!</div>
+
+        <p style="margin-bottom:1.25rem;font-size:.95rem;">
+          Salve ou imprima o QR Code abaixo. Ele será exigido na entrada do evento.
+        </p>
+
+        <div class="qr-wrapper">
+          <div id="qrcode"></div>
+          <p style="font-size:.8rem;color:var(--gray-500);">Código: <strong id="codigoInscricao"></strong></p>
+        </div>
+
+        <div id="dadosFinais" style="margin-top:1.25rem;text-align:left;"></div>
+
+        <hr class="divider" />
+
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center;">
+          <button class="btn btn-outline" onclick="window.print()">🖨️ Imprimir</button>
+          <button class="btn btn-primary" id="btnBaixarQR">⬇️ Salvar QR Code</button>
+          <a class="btn btn-outline" href="../index.html">Voltar aos eventos</a>
+        </div>
+
+        <p style="margin-top:1rem;font-size:.82rem;color:var(--gray-500);">
+          Um e-mail com o QR Code foi enviado para <strong id="emailEnviado"></strong>
+        </p>
+        <p style="margin-top:.5rem;font-size:.82rem;color:var(--gray-500);">
+          🎓 Após o evento, seu certificado estará disponível na aba
+          <a id="linkCertificado" href="#" style="color:var(--blue-600);font-weight:600;">Certificado</a>.
+        </p>
+      </div>
+    </div>
+
+  </div><!-- /container -->
+</div><!-- /pageContent -->
+
+<script>
+// ===== CONFIG =====
+const CONFIG = { APPS_SCRIPT_URL: "https://script.google.com/macros/s/SEU_ID_AQUI/exec" };
+
+// ===== UTILS =====
+function formatCPF(v){v=v.replace(/\D/g,"");if(v.length>11)v=v.slice(0,11);return v.replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");}
+function formatPhone(v){v=v.replace(/\D/g,"");if(v.length>11)v=v.slice(0,11);if(v.length<=10)return v.replace(/(\d{2})(\d{4})(\d)/,"($1) $2-$3");return v.replace(/(\d{2})(\d{5})(\d)/,"($1) $2-$3");}
+function validCPF(c){c=c.replace(/\D/g,"");if(c.length!==11||/^(\d)\1+$/.test(c))return false;let s=0;for(let i=0;i<9;i++)s+=+c[i]*(10-i);let r=s%11<2?0:11-s%11;if(r!==+c[9])return false;s=0;for(let i=0;i<10;i++)s+=+c[i]*(11-i);r=s%11<2?0:11-s%11;return r===+c[10];}
+function validEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);}
+function nowBR(){const d=new Date();return d.toLocaleDateString("pt-BR")+" "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});}
+async function appsScriptFetch(p){const u=CONFIG.APPS_SCRIPT_URL+"?"+new URLSearchParams(p);const r=await fetch(u,{redirect:"follow"});return r.json();}
+async function appsScriptPost(d){const r=await fetch(CONFIG.APPS_SCRIPT_URL,{method:"POST",redirect:"follow",body:JSON.stringify(d)});return r.json();}
+function showAlert(t,m){document.getElementById("alertBox").innerHTML=`<div class="alert alert-${t}">${m}</div>`;}
+function clearAlert(){document.getElementById("alertBox").innerHTML="";}
+function renderQR(id,text,size){const el=document.getElementById(id);if(!el)return;el.innerHTML="";new QRCode(el,{text,width:size,height:size,correctLevel:QRCode.CorrectLevel.H});}
+function qrToDataURL(id){const img=document.querySelector("#"+id+" img");if(img)return img.src;const cv=document.querySelector("#"+id+" canvas");return cv?cv.toDataURL("image/png"):null;}
+
+// ===== DEMO EVENTS =====
+const DEMO_EVENTS = {
+  ev001:{id:"ev001",titulo:"Curso de Audiometria Clínica",data:"15/08/2025",horario:"08:00 – 17:00",local:"Online (Zoom)",vagas:40,inscritos:18,certificado:true,gratuito:false,valorInscricao:120},
+  ev002:{id:"ev002",titulo:"Workshop: Reabilitação Auditiva",data:"22/08/2025",horario:"13:00 – 18:00",local:"São Paulo – SP",vagas:25,inscritos:10,certificado:true,gratuito:true,valorInscricao:0},
+  ev003:{id:"ev003",titulo:"Jornada de Fonoaudiologia 2025",data:"05/09/2025",horario:"08:00 – 18:00",local:"Recife – PE",vagas:100,inscritos:47,certificado:true,gratuito:false,valorInscricao:200},
+};
+
+let evento = null;
+let formData = {};
+
+// ===== STEP NAVIGATION — com animação de progresso =====
+const STEP_INFO = [
+  null,
+  {icon:"📝", text:"Preencha seus dados para continuar"},
+  {icon:"👁️", text:"Revise tudo e confirme sua inscrição"},
+  {icon:"🎉", text:"Inscrição concluída! Guarde seu QR Code"},
+];
+
+function goStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById("step"+i).style.display = i===n ? "block" : "none";
+    const sEl = document.getElementById("s"+i);
+    const snEl = document.getElementById("sn"+i);
+    if(i < n) {
+      sEl.className = "step done";
+      snEl.textContent = "✓";
+    } else if(i === n) {
+      sEl.className = "step active";
+      snEl.textContent = i;
+    } else {
+      sEl.className = "step";
+      snEl.textContent = i;
+    }
+  });
+
+  // Anima a linha de progresso: 0% → 50% → 100%
+  const pct = n===1 ? 0 : n===2 ? 50 : 100;
+  document.getElementById("progressLine").style.width = pct+"%";
+
+  // Atualiza texto informativo
+  const info = STEP_INFO[n];
+  document.getElementById("stepInfo").innerHTML =
+    `<span>${info.icon}</span> <span id="stepInfoText">${info.text}</span>`;
+
+  clearAlert();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// ===== LOAD EVENT =====
+const params = new URLSearchParams(location.search);
+const eventoId = params.get("evento");
+
+async function loadEvent() {
+  try {
+    if(!CONFIG.APPS_SCRIPT_URL.includes("SEU_ID_AQUI")) {
+      const d = await appsScriptFetch({action:"getEvento",id:eventoId});
+      evento = d.evento;
+    } else {
+      evento = DEMO_EVENTS[eventoId] || DEMO_EVENTS["ev001"];
+    }
+  } catch {
+    evento = DEMO_EVENTS[eventoId] || DEMO_EVENTS["ev001"];
+  }
+  document.getElementById("heroTitle").textContent = evento.titulo;
+  document.getElementById("heroSub").textContent =
+    `📅 ${evento.data}  🕐 ${evento.horario}  📍 ${evento.local}`;
+
+  // Badge de inscrição gratuita ou paga
+  const pago = evento.gratuito === false || evento.gratuito === "false";
+  const valorBadge = pago
+    ? `<span style="display:inline-flex;align-items:center;gap:.3rem;background:rgba(255,255,255,.18);color:#fff;padding:.25rem .75rem;border-radius:99px;font-size:.82rem;font-weight:600;margin-top:.5rem;">💳 Inscrição: R$ ${Number(evento.valorInscricao||0).toFixed(2)}</span>`
+    : `<span style="display:inline-flex;align-items:center;gap:.3rem;background:rgba(255,255,255,.18);color:#fff;padding:.25rem .75rem;border-radius:99px;font-size:.82rem;font-weight:600;margin-top:.5rem;">🆓 Inscrição gratuita</span>`;
+  const badgeEl = document.createElement("div");
+  badgeEl.style.marginTop = ".5rem";
+  badgeEl.innerHTML = valorBadge;
+  document.querySelector(".page-hero").appendChild(badgeEl);
+
+  // Aviso de pagamento externo (só para eventos pagos)
+  if (pago) {
+    const aviso = document.createElement("div");
+    aviso.style.cssText = "background:var(--amber-50);border-left:4px solid var(--amber-500);color:#92400e;padding:.75rem 1rem;border-radius:8px;font-size:.85rem;margin-bottom:1rem;";
+    aviso.innerHTML = `⚠️ <strong>Evento pago — R$ ${Number(evento.valorInscricao||0).toFixed(2)}</strong>. Após se inscrever, o pagamento deve ser realizado via PIX ou link enviado por e-mail. Sua vaga será confirmada após a verificação do pagamento.`;
+    document.getElementById("alertBox").before(aviso);
+  }
+
+  document.getElementById("pageLoading").style.display = "none";
+  document.getElementById("pageContent").style.display = "block";
+}
+loadEvent();
+
+// ===== MÁSCARAS =====
+document.getElementById("cpf").addEventListener("input",function(){this.value=formatCPF(this.value);});
+document.getElementById("telefone").addEventListener("input",function(){this.value=formatPhone(this.value);});
+
+// ===== PASSO 1 → 2 =====
+document.getElementById("btnStep1").addEventListener("click", () => {
+  const nome      = document.getElementById("nome").value.trim();
+  const cpf       = document.getElementById("cpf").value.trim();
+  const telefone  = document.getElementById("telefone").value.trim();
+  const email     = document.getElementById("email").value.trim();
+  const profissao = document.getElementById("profissao").value.trim();
+  const registro  = document.getElementById("registro").value.trim();
+
+  if(!nome)                        { showAlert("error","Informe seu nome completo."); return; }
+  if(!validCPF(cpf))               { showAlert("error","CPF inválido. Verifique o número."); return; }
+  if(telefone.replace(/\D/g,"").length<10){ showAlert("error","Telefone inválido."); return; }
+  if(!validEmail(email))           { showAlert("error","E-mail inválido."); return; }
+
+  formData = {nome,cpf,telefone,email,profissao,registro};
+
+  document.getElementById("resumoEvento").innerHTML =
+    `<strong>${evento.titulo}</strong><br>📅 ${evento.data} &nbsp; 🕐 ${evento.horario} &nbsp; 📍 ${evento.local}`;
+
+  document.getElementById("resumoDados").innerHTML = `
+    <div class="info-row"><span class="label">Nome</span><span class="value">${nome}</span></div>
+    <div class="info-row"><span class="label">CPF</span><span class="value">${cpf}</span></div>
+    <div class="info-row"><span class="label">Telefone</span><span class="value">${telefone}</span></div>
+    <div class="info-row"><span class="label">E-mail</span><span class="value">${email}</span></div>
+    ${profissao?`<div class="info-row"><span class="label">Profissão</span><span class="value">${profissao}</span></div>`:""}
+    ${registro ?`<div class="info-row"><span class="label">Registro</span><span class="value">${registro}</span></div>`:""}
+  `;
+  goStep(2);
+});
+
+// ===== PASSO 2 → 3 =====
+document.getElementById("btnConfirmar").addEventListener("click", async () => {
+  const btn = document.getElementById("btnConfirmar");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Enviando…';
+
+  const codigo = "ISW-" + Date.now().toString(36).toUpperCase();
+  const payload = {action:"inscrever",eventoId:evento.id,codigo,...formData,dataInscricao:nowBR(),status:"Confirmado"};
+
+  try {
+    if(!CONFIG.APPS_SCRIPT_URL.includes("SEU_ID_AQUI")) await appsScriptPost(payload);
+
+    document.getElementById("codigoInscricao").textContent = codigo;
+    document.getElementById("emailEnviado").textContent = formData.email;
+    document.getElementById("linkCertificado").href = `certificado.html?codigo=${codigo}`;
+    document.getElementById("dadosFinais").innerHTML = `
+      <div class="info-row"><span class="label">Participante</span><span class="value">${formData.nome}</span></div>
+      <div class="info-row"><span class="label">Evento</span><span class="value">${evento.titulo}</span></div>
+      <div class="info-row"><span class="label">Data</span><span class="value">${evento.data} · ${evento.horario}</span></div>
+      <div class="info-row"><span class="label">Local</span><span class="value">${evento.local}</span></div>
+      <div class="info-row"><span class="label">Status</span><span class="value"><span class="badge badge-green">✅ Confirmado</span></span></div>
+    `;
+
+    goStep(3);
+    setTimeout(() => renderQR("qrcode", codigo, 200), 100);
+
+    document.getElementById("btnBaixarQR").addEventListener("click", () => {
+      setTimeout(() => {
+        const url = qrToDataURL("qrcode");
+        if(!url) return;
+        const a = document.createElement("a");
+        a.href = url; a.download = `qrcode-${codigo}.png`; a.click();
+      }, 300);
+    });
+
+  } catch(e) {
+    showAlert("error","Erro ao gravar inscrição. Tente novamente.<br><small>"+e.message+"</small>");
+    btn.disabled = false;
+    btn.innerHTML = "✅ Confirmar inscrição";
+  }
+});
+</script>
+</body>
+</html>

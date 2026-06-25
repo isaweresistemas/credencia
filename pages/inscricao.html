@@ -368,12 +368,16 @@ async function loadEvent() {
     if(!CONFIG.APPS_SCRIPT_URL.includes("SEU_ID_AQUI")) {
       const d = await appsScriptFetch({action:"getEvento",id:eventoId});
       evento = d.evento;
-    } else {
-      evento = DEMO_EVENTS[eventoId] || DEMO_EVENTS["ev001"];
     }
   } catch {
+    // silencioso
+  }
+
+  // Se não encontrou no backend, usa demo
+  if (!evento) {
     evento = DEMO_EVENTS[eventoId] || DEMO_EVENTS["ev001"];
   }
+
   document.getElementById("heroTitle").textContent = evento.titulo;
   document.getElementById("heroSub").textContent =
     `📅 ${evento.data}  🕐 ${evento.horario}  📍 ${evento.local}`;

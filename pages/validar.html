@@ -194,7 +194,7 @@
 <!-- jsQR para leitura de QR Code via câmera -->
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <script>
-const CONFIG = { APPS_SCRIPT_URL: "https://script.google.com/macros/s/SEU_ID_AQUI/exec" };
+const CONFIG = { APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbySSIglvimz5jN4MbdY38Dwsn1Tg5AErRMEHw5c1u5cZy9mJryN-wq9two0S8OeBeRH/exec" };
 async function appsScriptFetch(p){const u=CONFIG.APPS_SCRIPT_URL+"?"+new URLSearchParams(p);const r=await fetch(u,{redirect:"follow"});return r.json();}
 async function appsScriptPost(d){const r=await fetch(CONFIG.APPS_SCRIPT_URL,{method:"POST",redirect:"follow",body:JSON.stringify(d)});return r.json();}
 function showAlert(t,m,id="alertBox"){const el=document.getElementById(id);if(el)el.innerHTML=`<div class="alert alert-${t}">${m}</div>`;}

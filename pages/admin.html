@@ -154,6 +154,17 @@
 
     <div id="alertBox"></div>
 
+    <!-- ===== BARRA DE FERRAMENTAS ADMIN ===== -->
+    <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:.85rem 1.1rem;">
+      <span style="font-size:.8rem;font-weight:600;color:var(--gray-500);flex:1;min-width:120px;">⚙️ Ferramentas do administrador</span>
+      <button class="btn btn-outline" id="btnModoDemo" title="Carrega eventos e inscritos de demonstração para testar o sistema">
+        🎭 Modo DEMO
+      </button>
+      <button class="btn btn-danger" id="btnReset" title="Apaga todos os dados locais e reinicia o sistema zerado">
+        🔴 RESET
+      </button>
+    </div>
+
     <!-- ABAS PRINCIPAIS -->
     <div class="tabs">
       <button class="tab active" data-tab="eventos">📋 Eventos</button>
@@ -314,10 +325,57 @@
 
     <!-- ===== ABA: CERTIFICADOS ===== -->
     <div id="tab-certificados" class="tab-panel">
+
+      <!-- PASSO A PASSO -->
+      <div class="card" style="background:var(--blue-50);border:1.5px solid var(--blue-100);">
+        <div class="card-title" style="color:var(--blue-700);">📋 Como funciona o certificado — passo a passo</div>
+        <div style="display:flex;flex-direction:column;gap:.6rem;">
+          <div style="display:flex;gap:.75rem;align-items:flex-start;">
+            <div style="background:var(--blue-600);color:#fff;border-radius:50%;width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;">1</div>
+            <div>
+              <strong style="font-size:.88rem;">Prepare o modelo PDF em branco</strong>
+              <p style="font-size:.82rem;color:var(--gray-500);margin-top:.15rem;">Crie no Canva, Word ou PowerPoint o visual do certificado <em>sem</em> os dados do participante (deixe os campos em branco onde os textos serão inseridos). Exporte como PDF.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:flex-start;">
+            <div style="background:var(--blue-600);color:#fff;border-radius:50%;width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;">2</div>
+            <div>
+              <strong style="font-size:.88rem;">Faça upload no configurador (abaixo)</strong>
+              <p style="font-size:.82rem;color:var(--gray-500);margin-top:.15rem;">Selecione o evento, abra o configurador e envie o PDF. O sistema mostrará uma pré-visualização onde você arrasta e posiciona os campos (nome, CPF, evento, data, carga horária, código).</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:flex-start;">
+            <div style="background:var(--blue-600);color:#fff;border-radius:50%;width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;">3</div>
+            <div>
+              <strong style="font-size:.88rem;">Salve a configuração</strong>
+              <p style="font-size:.82rem;color:var(--gray-500);margin-top:.15rem;">O modelo e as posições dos campos ficam salvos na planilha Google Sheets (ou no localStorage em modo demo). <em>Todos os participantes usarão esse mesmo modelo.</em></p>
+            </div>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:flex-start;">
+            <div style="background:var(--green-500);color:#fff;border-radius:50%;width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;">4</div>
+            <div>
+              <strong style="font-size:.88rem;">Participante acessa "Minha Inscrição" → baixa o certificado</strong>
+              <p style="font-size:.82rem;color:var(--gray-500);margin-top:.15rem;">Após o evento, o participante acessa <strong>minha-inscricao.html</strong>, localiza sua inscrição (que deve estar com presença = <em>Presente</em>) e clica em <strong>🎓 Ver / baixar certificado</strong>. O sistema gera o PDF com os dados dele preenchidos automaticamente no modelo que você configurou.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:flex-start;">
+            <div style="background:var(--amber-500);color:#fff;border-radius:50%;width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;">⚠️</div>
+            <div>
+              <strong style="font-size:.88rem;">Onde fica salvo o modelo?</strong>
+              <p style="font-size:.82rem;color:var(--gray-500);margin-top:.15rem;">
+                <strong>Com Google Apps Script ativo:</strong> o PDF modelo e as configurações de campos ficam salvos no Google Drive / Planilha, acessíveis por todos os participantes via URL.<br>
+                <strong>Em modo DEMO / offline:</strong> os dados ficam no <code>localStorage</code> do seu navegador — serve para testes, mas não persiste entre dispositivos.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONFIGURADOR -->
       <div class="card">
         <div class="card-title">🎓 Configurar modelo de certificado</div>
         <p style="font-size:.88rem;color:var(--gray-500);margin-bottom:1rem;">
-          Selecione o evento, faça upload do PDF em branco e defina os campos. O modelo fica <strong>restrito ao admin</strong> — o participante apenas baixa o certificado gerado com seus dados.
+          Selecione o evento e abra o configurador visual para fazer upload do PDF modelo e posicionar os campos.
         </p>
         <div class="form-group">
           <label>Evento</label>
@@ -334,6 +392,18 @@
           O configurador visual completo está em <code>certificado.html?evento=ID&amp;tab=configurar&amp;pin=SEU_PIN</code>
         </p>
       </div>
+
+      <!-- CHECKLIST STATUS -->
+      <div class="card">
+        <div class="card-title">✅ Checklist para liberação do certificado</div>
+        <div style="display:flex;flex-direction:column;gap:.5rem;font-size:.87rem;">
+          <label style="display:flex;align-items:center;gap:.6rem;cursor:pointer;"><input type="checkbox" /> PDF modelo configurado neste painel</label>
+          <label style="display:flex;align-items:center;gap:.6rem;cursor:pointer;"><input type="checkbox" /> Evento marcado como <em>Emite certificado ✅</em></label>
+          <label style="display:flex;align-items:center;gap:.6rem;cursor:pointer;"><input type="checkbox" /> Presença dos participantes confirmada (≠ Pendente)</label>
+          <label style="display:flex;align-items:center;gap:.6rem;cursor:pointer;"><input type="checkbox" /> Participante acessou <em>Minha Inscrição</em> e clicou em <em>Certificado</em></label>
+        </div>
+      </div>
+
     </div><!-- /tab-certificados -->
 
   </div><!-- /painel -->
@@ -1059,6 +1129,64 @@ document.getElementById("certEvento").addEventListener("change", function() {
     btn.style.pointerEvents = "none";
     btn.style.opacity = ".5";
   }
+});
+
+// ================================================================
+//  BOTÃO: MODO DEMO
+// ================================================================
+document.getElementById("btnModoDemo").addEventListener("click", () => {
+  if (!confirm("Ativar modo DEMO? Os dados atuais da sessão serão substituídos pelos dados de exemplo. (Nenhum dado real é apagado.)")) return;
+
+  // Restaura dados demo padrão
+  DEMO_EVENTOS = [
+    { id:"ev001", titulo:"Curso de Audiometria Clínica", data:"15/08/2025", horario:"08:00–17:00", local:"Online (Zoom)", vagas:40, inscritos:18, descricao:"Capacitação prática em audiometria tonal e vocal para fonoaudiólogos e otorrinolaringologistas.", certificado:true, cargaHoraria:"8h", publicado:true, gratuito:false, valorInscricao:120 },
+    { id:"ev002", titulo:"Workshop: Reabilitação Auditiva", data:"22/08/2025", horario:"13:00–18:00", local:"São Paulo – SP", vagas:25, inscritos:10, descricao:"Abordagem clínica moderna para reabilitação de pacientes com perda auditiva.", certificado:true, cargaHoraria:"5h", publicado:true, gratuito:true, valorInscricao:0 },
+    { id:"ev003", titulo:"Jornada de Fonoaudiologia 2025", data:"05/09/2025", horario:"08:00–18:00", local:"Recife – PE", vagas:100, inscritos:47, descricao:"Congresso com palestras, mesas-redondas e oficinas.", certificado:true, cargaHoraria:"10h", publicado:false, gratuito:false, valorInscricao:200 },
+  ];
+  DEMO_INSCRITOS = [
+    { codigo:"ISW-DEMO01", eventoId:"ev001", nome:"Maria Silva Santos", cpf:"123.456.789-09", email:"demo@isawere.com.br", telefone:"(81) 99999-0001", profissao:"Fonoaudióloga", registro:"CRFa 12345", status:"Confirmado", presenca:"Presente", dataInscricao:"01/07/2025 14:32", brinde:true, alimentoKg:false, presenteEntregue:true, kit:true },
+    { codigo:"ISW-DEMO02", eventoId:"ev001", nome:"João Carlos Pereira", cpf:"987.654.321-00", email:"joao@email.com", telefone:"(11) 98888-0002", profissao:"Otorrinolaringologista", registro:"CRM 67890", status:"Confirmado", presenca:"Pendente", dataInscricao:"02/07/2025 09:10", brinde:false, alimentoKg:false, presenteEntregue:false, kit:false },
+    { codigo:"VIP-DEMO03", eventoId:"ev001", nome:"Dra. Ana Beatriz Lima", cpf:"", email:"ana@clinica.com", telefone:"", profissao:"Diretora Clínica", registro:"", status:"VIP", presenca:"Presente", dataInscricao:"15/08/2025 08:00", brinde:true, alimentoKg:true, presenteEntregue:true, kit:true },
+    { codigo:"ISW-DEMO04", eventoId:"ev002", nome:"Carlos Mendes", cpf:"111.222.333-44", email:"carlos@email.com", telefone:"(21) 97777-0003", profissao:"Fonoaudiólogo", registro:"CRFa 55555", status:"Confirmado", presenca:"Pendente", dataInscricao:"10/07/2025 11:20", brinde:false, alimentoKg:false, presenteEntregue:false, kit:false },
+  ];
+  window.__eventosCache = DEMO_EVENTOS;
+  window.__inscritosCache = null;
+  carregarEventos();
+  popularSelectEventos();
+  showAlert("success", "🎭 Modo DEMO ativado! Dados de exemplo carregados. Use CPF <code>123.456.789-09</code> ou e-mail <code>demo@isawere.com.br</code> para testar o lado do participante.");
+  document.querySelector(".tab[data-tab='eventos']").click();
+});
+
+// ================================================================
+//  BOTÃO: RESET
+// ================================================================
+document.getElementById("btnReset").addEventListener("click", () => {
+  if (!confirm("⚠️ ATENÇÃO: O RESET apaga todos os dados de demonstração da sessão e limpa o estado local (localStorage de certificados). Dados no Google Sheets NÃO são afetados.\n\nDeseja continuar?")) return;
+
+  // Zera arrays demo
+  DEMO_EVENTOS = [];
+  DEMO_INSCRITOS = [];
+  window.__eventosCache = [];
+  window.__inscritosCache = null;
+
+  // Limpa localStorage de configurações de certificado (modo demo/offline)
+  const keysToRemove = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && (key.startsWith("isawere_cert_") || key.startsWith("isawere_evento_") || key.startsWith("isawere_"))) {
+      keysToRemove.push(key);
+    }
+  }
+  keysToRemove.forEach(k => localStorage.removeItem(k));
+
+  // Atualiza UI
+  carregarEventos();
+  popularSelectEventos();
+  document.getElementById("inscritosResultado").innerHTML = "";
+  document.getElementById("estatisticasResultado").innerHTML = "";
+
+  showAlert("success", "🔴 RESET concluído. O sistema está zerado e pronto para você cadastrar novos eventos e convidar os participantes para se inscreverem.");
+  document.querySelector(".tab[data-tab='eventos']").click();
 });
 
 // ================================================================

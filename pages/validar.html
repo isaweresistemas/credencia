@@ -114,7 +114,7 @@
     <div class="card-title">📷 Câmera (Scanner)</div>
 
     <div class="scan-area" id="scanArea">
-      <video id="video" playsinline></video>
+      <video id="video" playsinline autoplay muted></video>
       <div class="scan-line" id="scanLine"></div>
       <div id="cameraOff" style="color:var(--gray-300);font-size:.9rem;padding:2rem;text-align:center;">
         <p style="font-size:2rem;margin-bottom:.5rem;">📷</p>
@@ -336,8 +336,25 @@ const ctx = canvas.getContext("2d");
 
 async function startCamera() {
   try {
-    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+    // Constraints explícitas — Android precisa de width/height para ativar o sensor
+    const constraints = {
+      video: {
+        facingMode: { ideal: "environment" },
+        width:  { ideal: 1280 },
+        height: { ideal: 720 },
+      }
+    };
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
     video.srcObject = stream;
+
+    // Android às vezes ignora autoplay — forçamos o play manualmente
+    video.onloadedmetadata = () => {
+      video.play().catch(() => {});
+    };
+
+    // Fallback: se onloadedmetadata não disparar em 1s, tenta play de qualquer forma
+    setTimeout(() => { video.play().catch(() => {}); }, 800);
+
     video.style.display = "block";
     document.getElementById("cameraOff").style.display = "none";
     document.getElementById("scanLine").style.display = "block";
@@ -346,7 +363,22 @@ async function startCamera() {
     scanning = true;
     requestAnimationFrame(scanFrame);
   } catch (e) {
-    showAlert("error", "Não foi possível acessar a câmera. Verifique as permissões.");
+    // Tenta fallback sem especificar facingMode (alguns Android recusam "environment")
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = stream;
+      video.onloadedmetadata = () => { video.play().catch(() => {}); };
+      setTimeout(() => { video.play().catch(() => {}); }, 800);
+      video.style.display = "block";
+      document.getElementById("cameraOff").style.display = "none";
+      document.getElementById("scanLine").style.display = "block";
+      document.getElementById("btnCamera").style.display = "none";
+      document.getElementById("btnParar").style.display = "inline-flex";
+      scanning = true;
+      requestAnimationFrame(scanFrame);
+    } catch (e2) {
+      showAlert("error", "Não foi possível acessar a câmera. Verifique as permissões do navegador. <br><small>" + (e2.message || e.message) + "</small>");
+    }
   }
 }
 
@@ -365,18 +397,23 @@ let lastTime = 0;
 
 function scanFrame() {
   if (!scanning) return;
-  if (video.readyState === video.HAVE_ENOUGH_DATA) {
-    canvas.width  = video.videoWidth;
-    canvas.height = video.videoHeight;
-    ctx.drawImage(video, 0, 0);
-    const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const code = jsQR(img.data, img.width, img.height, { inversionAttempts: "dontInvert" });
-    if (code && code.data) {
-      const now = Date.now();
-      if (code.data !== lastCode || now - lastTime > 3000) {
-        lastCode = code.data;
-        lastTime = now;
-        validarCodigo(code.data);
+  // Android pode ter readyState < HAVE_ENOUGH_DATA mas o vídeo já estar renderizando
+  if (video.readyState >= video.HAVE_CURRENT_DATA && video.videoWidth > 0) {
+    const w = video.videoWidth;
+    const h = video.videoHeight;
+    if (w > 0 && h > 0) {
+      canvas.width  = w;
+      canvas.height = h;
+      ctx.drawImage(video, 0, 0, w, h);
+      const img = ctx.getImageData(0, 0, w, h);
+      const code = jsQR(img.data, img.width, img.height, { inversionAttempts: "dontInvert" });
+      if (code && code.data) {
+        const now = Date.now();
+        if (code.data !== lastCode || now - lastTime > 3000) {
+          lastCode = code.data;
+          lastTime = now;
+          validarCodigo(code.data);
+        }
       }
     }
   }

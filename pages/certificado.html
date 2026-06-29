@@ -332,7 +332,11 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 
 <script>
 // ===== CONFIG =====
-const CONFIG = { APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbySSIglvimz5jN4MbdY38Dwsn1Tg5AErRMEHw5c1u5cZy9mJryN-wq9two0S8OeBeRH/exec" };
+const CONFIG = {
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbySSIglvimz5jN4MbdY38Dwsn1Tg5AErRMEHw5c1u5cZy9mJryN-wq9two0S8OeBeRH/exec",
+  // ← ID do arquivo certficado.pdf no Google Drive (compartilhamento público "qualquer pessoa com o link")
+  CERT_DRIVE_FILE_ID: "1c9IiYKclDYXQ0hEL5Crvx5AeTcIwSxwg",
+};
 // ===== UTILS =====
 function formatCPF(v){v=v.replace(/\D/g,"");if(v.length>11)v=v.slice(0,11);return v.replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");}
 function validCPF(c){c=c.replace(/\D/g,"");if(c.length!==11||/^(\d)\1+$/.test(c))return false;let s=0;for(let i=0;i<9;i++)s+=+c[i]*(10-i);let r=s%11<2?0:11-s%11;if(r!==+c[9])return false;s=0;for(let i=0;i<10;i++)s+=+c[i]*(11-i);r=s%11<2?0:11-s%11;return r===+c[10];}
@@ -879,6 +883,8 @@ const DEMO_CERT = {
     cargaHoraria: "8h",
     codigo: "ISW-DEMO01",
     presenca: "Presente",
+    driveFileId: "1c9IiYKclDYXQ0hEL5Crvx5AeTcIwSxwg", // seu PDF no Drive
+    certConfig: [],
   },
 };
 
@@ -980,36 +986,45 @@ function renderResultParticipante(cert) {
     document.getElementById("certAvisoModelo").innerHTML = "";
 
     try {
-      // O participante usa o certConfig embutido no resultado do getCertificado.
-      // O modelo PDF (Drive) só é acessível via admin — aqui usamos o demo/localStorage
-      // como fallback para pré-visualização, ou alertamos que o admin precisa configurar.
       let templateBytes = null;
-      let fields = null;
+      let fields        = null;
 
-      if (!CONFIG.APPS_SCRIPT_URL.includes("SEU_ID_AQUI")) {
-        // Modo produção: o backend retorna certConfig mas não o PDF.
-        // O PDF precisa ser buscado via admin. Por ora geramos com layout padrão
-        // e avisamos caso não haja config.
-        if (cert.certConfig && cert.certConfig.length > 0) {
-          fields = mergeFieldsWithConfig(cert.certConfig);
-          // templateBytes permanece null → generateCertPDF cria PDF em branco simples
-        } else {
-          document.getElementById("certAvisoModelo").innerHTML =
-            '<div class="alert alert-warning">⚠️ O modelo PDF deste evento ainda não foi configurado pelo administrador. Entre em contato com a organização.</div>';
-          return;
-        }
-      } else {
-        // Modo demo: usa localStorage
-        const b64 = localStorage.getItem("isawere_cert_pdf_" + cert.eventoId);
-        if (b64) {
-          templateBytes = base64ToArrayBuffer(b64);
-          const cfg = localStorage.getItem("isawere_cert_config_" + cert.eventoId);
-          fields = mergeFieldsWithConfig(cfg ? JSON.parse(cfg) : []);
-        } else {
-          fields = mergeFieldsWithConfig(cert.certConfig || []);
+      // ── 1. Tenta buscar o PDF modelo do Google Drive (URL pública configurada) ──
+      const driveFileId = cert.driveFileId || CONFIG.CERT_DRIVE_FILE_ID || null;
+
+      if (driveFileId) {
+        // Converte o link de compartilhamento para URL de download direto
+        const driveUrl = `https://drive.google.com/uc?export=download&id=${driveFileId}`;
+        try {
+          btn.innerHTML = '<span class="spinner"></span> Baixando modelo…';
+          const resp = await fetch(driveUrl);
+          if (!resp.ok) throw new Error("HTTP " + resp.status);
+          templateBytes = await resp.arrayBuffer();
+        } catch (driveErr) {
+          console.warn("Drive fetch falhou, tentando localStorage:", driveErr);
+          templateBytes = null;
         }
       }
 
+      // ── 2. Fallback: localStorage (modo demo / admin salvou localmente) ──
+      if (!templateBytes) {
+        const b64 = localStorage.getItem("isawere_cert_pdf_" + (cert.eventoId || "ev001"));
+        if (b64) templateBytes = base64ToArrayBuffer(b64);
+      }
+
+      if (!templateBytes) {
+        document.getElementById("certAvisoModelo").innerHTML =
+          '<div class="alert alert-warning">⚠️ O modelo PDF ainda não foi configurado para este evento. Contate a organização.</div>';
+        return;
+      }
+
+      // ── 3. Campos de posicionamento ──
+      const cfgRaw = localStorage.getItem("isawere_cert_config_" + (cert.eventoId || "ev001"));
+      const savedConfig = cfgRaw ? JSON.parse(cfgRaw) : (cert.certConfig || []);
+      fields = mergeFieldsWithConfig(savedConfig);
+
+      // ── 4. Gera e faz download ──
+      btn.innerHTML = '<span class="spinner"></span> Preenchendo dados…';
       const bytes = await generateCertPDF(cert, templateBytes, fields);
       const blob  = new Blob([bytes], { type: "application/pdf" });
       const url   = URL.createObjectURL(blob);
@@ -1018,6 +1033,7 @@ function renderResultParticipante(cert) {
       a.download  = `certificado-${cert.codigo}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
+
     } catch (e) {
       document.getElementById("certAvisoModelo").innerHTML =
         '<div class="alert alert-error">Erro ao gerar PDF: ' + e.message + '</div>';

@@ -236,9 +236,40 @@
           <input id="codigoManualOff" placeholder="ISW-XXXXXX ou VIP-XXXXXX" style="text-transform:uppercase;" />
           <button class="btn primary" id="btnValidarOff">Validar</button>
         </div>
+        <!-- Busca por CPF como fallback -->
+        <div style="margin-top:.75rem;">
+          <p style="font-size:.8rem;color:var(--gray-500);font-weight:600;margin-bottom:.35rem;">Sem QR Code? Buscar por CPF:</p>
+          <div class="row">
+            <input id="cpfFallbackOff" placeholder="000.000.000-00" type="text" maxlength="14" />
+            <button class="btn" id="btnCpfFallback">🔍 Buscar CPF</button>
+          </div>
+        </div>
       </div>
 
       <div id="resultadoOff"></div>
+
+      <!-- INSCRIÇÃO NA HORA -->
+      <div class="card" id="cardInscricaoHora" style="display:none;">
+        <h3>📝 Inscrever participante agora</h3>
+        <p class="hint" style="background:var(--amber-50);padding:.5rem .7rem;border-radius:6px;border-left:3px solid var(--amber-500);">
+          ⚠️ Participante não encontrado. Preencha os dados para inscrever na hora. O registro será sincronizado depois.
+        </p>
+        <div class="field"><label>Nome completo *</label><input id="ihNome" placeholder="Nome completo" /></div>
+        <div class="row">
+          <div class="field"><label>CPF</label><input id="ihCpf" placeholder="000.000.000-00" maxlength="14" /></div>
+          <div class="field"><label>Telefone</label><input id="ihTelefone" placeholder="(00) 00000-0000" /></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>E-mail</label><input id="ihEmail" placeholder="email@exemplo.com" type="email" /></div>
+          <div class="field"><label>Profissão</label><input id="ihProfissao" placeholder="Fonoaudióloga, médico…" /></div>
+        </div>
+        <div class="field"><label>Nº de registro profissional</label><input id="ihRegistro" placeholder="CRM, CRFa… (opcional)" /></div>
+        <div class="row" style="margin-top:.5rem;">
+          <button class="btn primary" id="btnInscreverHora">✅ Inscrever e confirmar presença</button>
+          <button class="btn outline" id="btnCancelarIH">✖ Cancelar</button>
+        </div>
+        <div id="ihStatus" class="status"></div>
+      </div>
 
       <div class="card">
         <h3>🌟 Criar credencial VIP (offline)</h3>
@@ -10486,7 +10517,7 @@ document.getElementById("btnSincronizar").addEventListener("click", async () => 
     }
     const d = await callPost({ action: "sincronizarOffline", pin: getPin(), eventoId: pacoteAlt.eventoId, alteracoes: pacoteAlt.alteracoes });
     if (d.erro) throw new Error(d.erro);
-    setStatus("syncStatus", `✅ Sincronizado! ${d.atualizados} atualizado(s), ${d.criados} criado(s)${d.ignorados ? ", " + d.ignorados + " ignorado(s)" : ""}.`, "ok");
+    setStatus("syncStatus", `✅ Sincronizado! ${d.atualizados} atualizado(s), ${d.criados} criado(s)${d.ignorados ? ", " + d.ignorados + " ignorado(s) (duplicatas mantidas do 1º registro)" : ""}.`, "ok");
   } catch (e) {
     setStatus("syncStatus", "❌ " + e.message, "err");
   }
@@ -10506,10 +10537,31 @@ function persistirEstado() {
   document.getElementById("qtdAlteracoes").textContent = alteracoes.length;
 }
 
+// ================================================================
+//  MERGE INTELIGENTE POR REGISTRO
+//  Regra: QR Code é o identificador primário; CPF é fallback.
+//  Duplicata (mesmo código de 2 operadores) → mantém o PRIMEIRO registro.
+// ================================================================
 function registrarAlteracao(parcial) {
-  let existente = alteracoes.find(a => a.codigo === parcial.codigo);
-  if (existente) Object.assign(existente, parcial);
-  else alteracoes.push(parcial);
+  const chave = parcial.codigo;
+  const existente = alteracoes.find(a => a.codigo === chave);
+
+  if (existente) {
+    // Duplicata detectada — se for um checkin de presença, mantém o PRIMEIRO (não sobrescreve)
+    // Apenas campos não-conflitantes (itens, cargo etc.) são mesclados se o 1º não os tiver
+    if (parcial.tipo === "checkin" && existente.tipo === "checkin") {
+      // Mantém presença do primeiro; mescla itens entregues (OR lógico — se qualquer operador marcou, conta)
+      ["brinde","alimentoKg","presenteEntregue","kit"].forEach(campo => {
+        if (parcial[campo] === true) existente[campo] = true;
+      });
+    } else if (parcial.tipo !== "checkin") {
+      // Para outros tipos (VIP, inscrição na hora), mescla normalmente
+      Object.assign(existente, parcial);
+    }
+    // Se o primeiro já registrou presença, não alteramos — "manter o primeiro"
+  } else {
+    alteracoes.push({ ...parcial, registradoEm: nowBRClient() });
+  }
   persistirEstado();
 }
 
@@ -10560,9 +10612,50 @@ function recalcContadores() {
   document.getElementById("cntNaoEncontradoOff").textContent = cntNaoEncontrado;
 }
 
+// Busca por código QR (primário)
 function buscarLocal(codigo) {
   return pacote.participantes.find(p => String(p.codigo).toUpperCase() === codigo.toUpperCase());
 }
+
+// Busca por CPF (fallback)
+function buscarLocalPorCPF(cpf) {
+  const cpfLimpo = cpf.replace(/\D/g, "");
+  if (!cpfLimpo) return null;
+  return pacote.participantes.find(p => p.cpf && p.cpf.replace(/\D/g, "") === cpfLimpo) || null;
+}
+
+function formatCPFOffline(v) {
+  v = v.replace(/\D/g,"");
+  if (v.length > 11) v = v.slice(0,11);
+  return v.replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");
+}
+
+document.getElementById("cpfFallbackOff").addEventListener("input", function() {
+  this.value = formatCPFOffline(this.value);
+});
+
+document.getElementById("btnCpfFallback").addEventListener("click", () => {
+  const cpf = document.getElementById("cpfFallbackOff").value.trim();
+  if (!cpf) return;
+  const p = buscarLocalPorCPF(cpf);
+  if (p) {
+    // Encontrou pelo CPF — valida normalmente
+    validarParticipante(p);
+    document.getElementById("cardInscricaoHora").style.display = "none";
+  } else {
+    // Não encontrou — mostra formulário de inscrição na hora, pré-preenchendo o CPF
+    cntNaoEncontrado++;
+    recalcContadores();
+    document.getElementById("resultadoOff").innerHTML = `
+      <div class="card result-card warn">
+        <div style="font-size:2rem;text-align:center;">🔍</div>
+        <div class="alert alert-warn">CPF <strong>${cpf}</strong> não encontrado na lista. Preencha o formulário abaixo para inscrever agora.</div>
+      </div>`;
+    document.getElementById("ihCpf").value = cpf;
+    document.getElementById("cardInscricaoHora").style.display = "block";
+    document.getElementById("ihNome").focus();
+  }
+});
 
 function itensRowHTML(p) {
   return `
@@ -10581,26 +10674,12 @@ function atualizarItemOffline(codigo, campo, valor) {
   registrarAlteracao({ codigo, tipo: "checkin", [campo]: valor });
 }
 
-function validarOffline(codigoRaw) {
-  const codigo = (codigoRaw || "").trim().toUpperCase();
-  if (!codigo) return;
+// Valida participante já encontrado
+function validarParticipante(p) {
   const resEl = document.getElementById("resultadoOff");
-  const p = buscarLocal(codigo);
-
-  if (!p) {
-    cntNaoEncontrado++;
-    recalcContadores();
-    resEl.innerHTML = `
-      <div class="card result-card err">
-        <div style="font-size:2.5rem;text-align:center;">❌</div>
-        <div class="alert alert-err">Código <strong>${codigo}</strong> não encontrado no pacote carregado.</div>
-      </div>`;
-    return;
-  }
-
   let avisoRepetido = "";
   if (p.presenca === "Presente") {
-    avisoRepetido = `<div class="alert alert-warn">⚠️ Presença já estava confirmada (pode ter sido validada antes).</div>`;
+    avisoRepetido = `<div class="alert alert-warn">⚠️ Presença já estava confirmada (pode ter sido validada por outro operador).</div>`;
   } else {
     p.presenca = "Presente";
     registrarAlteracao({ codigo: p.codigo, tipo: "checkin", presenca: "Presente" });
@@ -10621,12 +10700,100 @@ function validarOffline(codigoRaw) {
     </div>`;
 }
 
+function validarOffline(codigoRaw) {
+  const codigo = (codigoRaw || "").trim().toUpperCase();
+  if (!codigo) return;
+  const resEl = document.getElementById("resultadoOff");
+  const p = buscarLocal(codigo);
+
+  if (!p) {
+    cntNaoEncontrado++;
+    recalcContadores();
+    resEl.innerHTML = `
+      <div class="card result-card err">
+        <div style="font-size:2.5rem;text-align:center;">❌</div>
+        <div class="alert alert-err">Código <strong>${codigo}</strong> não encontrado.</div>
+        <p style="font-size:.85rem;color:var(--gray-500);margin-top:.5rem;">Tente buscar pelo CPF abaixo, ou preencha o formulário de inscrição na hora.</p>
+      </div>`;
+    // Exibe card de inscrição na hora
+    document.getElementById("cardInscricaoHora").style.display = "block";
+    document.getElementById("ihNome").focus();
+    return;
+  }
+
+  document.getElementById("cardInscricaoHora").style.display = "none";
+  validarParticipante(p);
+}
+
 document.getElementById("btnValidarOff").addEventListener("click", () => {
   validarOffline(document.getElementById("codigoManualOff").value);
   document.getElementById("codigoManualOff").value = "";
 });
 document.getElementById("codigoManualOff").addEventListener("keydown", e => {
   if (e.key === "Enter") document.getElementById("btnValidarOff").click();
+});
+
+// ── INSCRIÇÃO NA HORA ──
+document.getElementById("ihCpf").addEventListener("input", function() {
+  this.value = formatCPFOffline(this.value);
+});
+
+document.getElementById("btnCancelarIH").addEventListener("click", () => {
+  document.getElementById("cardInscricaoHora").style.display = "none";
+  ["ihNome","ihCpf","ihTelefone","ihEmail","ihProfissao","ihRegistro"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("ihStatus").innerHTML = "";
+});
+
+document.getElementById("btnInscreverHora").addEventListener("click", () => {
+  const nome = document.getElementById("ihNome").value.trim();
+  const cpf  = document.getElementById("ihCpf").value.trim();
+  if (!nome) { document.getElementById("ihStatus").innerHTML = '<span class="status err">⚠️ Nome é obrigatório.</span>'; return; }
+
+  // Verifica se CPF já existe (outro operador pode ter inscrito a mesma pessoa)
+  if (cpf) {
+    const jaExiste = buscarLocalPorCPF(cpf);
+    if (jaExiste) {
+      document.getElementById("ihStatus").innerHTML = `<div class="alert alert-warn">⚠️ CPF já encontrado: <strong>${jaExiste.nome}</strong> (${jaExiste.codigo}). Confirmando presença desse registro.</div>`;
+      validarParticipante(jaExiste);
+      document.getElementById("cardInscricaoHora").style.display = "none";
+      return;
+    }
+  }
+
+  const codigo = "IH-" + Date.now().toString(36).toUpperCase();
+  const dataInscricao = nowBRClient();
+  const novo = {
+    codigo,
+    eventoId: pacote.eventoId,
+    nome,
+    cpf:       cpf || "",
+    telefone:  document.getElementById("ihTelefone").value.trim(),
+    email:     document.getElementById("ihEmail").value.trim(),
+    profissao: document.getElementById("ihProfissao").value.trim(),
+    registro:  document.getElementById("ihRegistro").value.trim(),
+    status:    "Confirmado",
+    presenca:  "Presente",
+    dataInscricao,
+    brinde: false, alimentoKg: false, presenteEntregue: false, kit: false,
+  };
+
+  pacote.participantes.push(novo);
+  registrarAlteracao({ ...novo, tipo: "inscricao_hora" });
+  recalcContadores();
+
+  document.getElementById("ihStatus").innerHTML = `<div class="alert alert-ok">✅ ${nome} inscrito(a) com código <strong>${codigo}</strong>. Presença confirmada!</div>`;
+  document.getElementById("resultadoOff").innerHTML = `
+    <div class="card result-card">
+      <div style="font-size:2.5rem;text-align:center;">✅</div>
+      <div class="alert alert-ok">Inscrição na hora realizada com sucesso!</div>
+      <div class="info-row"><span class="label">Participante</span><span class="value">${nome}</span></div>
+      <div class="info-row"><span class="label">Código</span><span class="value">${codigo}</span></div>
+      <div class="info-row"><span class="label">Presença</span><span class="value">✅ Presente</span></div>
+      <hr class="div" />
+      ${itensRowHTML(novo)}
+    </div>`;
+  ["ihNome","ihCpf","ihTelefone","ihEmail","ihProfissao","ihRegistro"].forEach(id => document.getElementById(id).value = "");
+  setTimeout(() => { document.getElementById("cardInscricaoHora").style.display = "none"; }, 2000);
 });
 
 // ------- CÂMERA (jsQR embutido — funciona sem internet) -------
@@ -10727,6 +10894,7 @@ document.getElementById("btnExportarAlteracoes").addEventListener("click", () =>
     eventoId: pacote.eventoId,
     eventoTitulo: pacote.eventoTitulo,
     exportadoEm: nowBRClient(),
+    versao: 2,            // versão 2 = merge inteligente por registro
     alteracoes,
   }, `alteracoes-${pacote.eventoId}-${Date.now()}.json`);
 });

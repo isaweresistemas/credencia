@@ -251,15 +251,40 @@ function renderResultado(cert) {
   res.style.display = "block";
   res.scrollIntoView({ behavior: "smooth" });
 
-  // Clique no botão de download — baixa o PDF da própria pasta
+  // Clique no botão de download — fetch+blob para funcionar no GitHub Pages
   if (presente) {
-    document.getElementById("btnDownloadCert").addEventListener("click", () => {
-      const a = document.createElement("a");
-      a.href = CONFIG.CERT_PDF_PATH;           // "certificado.pdf" na mesma pasta
-      a.download = `certificado-${cert.codigo}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+    document.getElementById("btnDownloadCert").addEventListener("click", async () => {
+      const btn = document.getElementById("btnDownloadCert");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Preparando…';
+
+      try {
+        // Busca o PDF como blob (contorna restrição do GitHub Pages ao atributo download)
+        const response = await fetch(CONFIG.CERT_PDF_PATH);
+        if (!response.ok) throw new Error("PDF não encontrado na pasta.");
+        const blob = await response.blob();
+
+        // Nome do arquivo com nome do participante (sem acentos, espaços viram _)
+        const nomeArquivo = cert.nome
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .replace(/\s+/g, "_")
+          .toLowerCase();
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `certificado_${nomeArquivo}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+      } catch (e) {
+        alert("Erro ao baixar o certificado: " + e.message + "\n\nVerifique se o arquivo 'certificado.pdf' está na mesma pasta.");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "🎓 Baixar certificado em PDF";
+      }
     });
   }
 }
